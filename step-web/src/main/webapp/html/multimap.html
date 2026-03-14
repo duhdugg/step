@@ -38,13 +38,6 @@
 		top:0px;
 		left:0px;
 	}
-	/* Set the size of the div element that contains the map */
-	#googlemap {
-	  height: 500px;
-	  /* The height is 500 pixels */
-	  width: 100%;
-	  /* The width is the width of the web page */
-	}
   </style>
 </head>
 <body style="margin:0;background-color:white;overflow:auto">
@@ -69,6 +62,7 @@
 		<div>
 			<ul class="nav nav-tabs">
 				<li id="googlemap_li"><a href="#googlemap" data-toggle="tab">Google</a></li>
+				<li id="openstreetmap_li"><a href="#openstreetmap" data-toggle="tab">OpenStreetMap</a></li>
 				<li id="patriarchs_li"><a href="#patriarchs" data-toggle="tab">Middle East</a></li>
 				<li id="exodus_li"><a href="#exodus" data-toggle="tab">Exodus & Conquest</a></li>
 				<li id="tribes_li"><a href="#tribes" data-toggle="tab">Tribes of Israel</a></li>
@@ -80,6 +74,12 @@
 			</ul>
 			<div class="tab-content">
 				<div class="tab-pane fade" id="googlemap">
+					<div><button type="button" class="btn btn-link" onClick="openGoogleMaps();">Open Google Maps</button></div>
+				</div>
+				<div class="tab-pane fade" id="openstreetmap">
+					<iframe id="openstreetmapframe" width="100%" height="800px" src="" scrolling="yes"></iframe>
+					<br/>
+					<div style="position: absolute; bottom: 0"><small><a id="openstreetmaplink" href="" target="_blank">View Larger Map</a></small></div>
 				</div>
 				<div class="tab-pane fade" id="patriarchs">
 					<img class="biblemap" src="/images/patriarchs.png" />
@@ -227,10 +227,6 @@ function setupMap() {
 		if (pos == -1) strongNum = tmp;
 		else if (pos > 0) strongNum = tmp.substr(0,pos);
 	}
-	if (window.location.host.indexOf("stepbible.org") == -1) {
-		$("#palopenmaps_li").find("a")[0].innerHTML = "Pre-modern maps (online)";
-		$("#googlemap_li").hide();
-	}
 	var tmpAry = coord.split(",");
 	latArg = parseFloat(tmpAry[0]);
 	longArg = parseFloat(tmpAry[1]);
@@ -289,18 +285,24 @@ function setupMap() {
 			$('.nav-tabs a[href="#' + mapSecondChoice + '"]').tab('show');
 	}
 	else {
-		if (typeof $('.nav-tabs a[href="#googlemap"]').tab === "function")
-			$('.nav-tabs a[href="#googlemap"]').tab('show');
-		$("#googlemap").append("<script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyDBSwzetgtDCvf5nUU0KcSdpjKeHOWo4z4&callback=initMap&libraries=&v=weekly' async ><\/script>");
+		if (typeof $('.nav-tabs a[href="#openstreetmap"]').tab === "function")
+			$('.nav-tabs a[href="#openstreetmap"]').tab('show');
 	}
 
 	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 		var target = $(e.target).attr("href") // activated tab
-		if (target === "#palopenmaps")
+		if (target === "#palopenmaps") {
 			$("#palopenmapsiframe").attr('src',"https://palopenmaps.org/view/9999/@" + latArg + ',' + longArg);
+			resizeiframe();
+		}
+
 		else if (target === "#googlemap")
-			// Async script executes immediately and must be after any DOM elements used in callback.
-			$("#googlemap").empty().append("<script src='https://maps.googleapis.com/maps/api/js?key=AIzaSyDBSwzetgtDCvf5nUU0KcSdpjKeHOWo4z4&callback=initMap&libraries=&v=weekly' async ><\/script>");
+			openGoogleMaps();
+
+		else if (target === "#openstreetmap") {
+			loadOpenStreetMap();
+			resizeiframe();
+		}
 	});
 }
 
@@ -322,20 +324,27 @@ function updateRedCircle(latArg, longArg, latMax, latMin, longMax, longMin, latR
 	}
 }
 
-function initMap() {
+function openGoogleMaps() {
+	window.open(`https://maps.google.com/?q=loc:${latArg},${longArg}&ll=${latArg},${longArg}&z=12`, "_blank")
+}
 
-  var positionProvided = { lat: latArg, lng: longArg };
-  // The map, centered at positionProvided
-  var map = new google.maps.Map(document.getElementById("googlemap"), {
-    zoom: 9,
-    center: positionProvided,
-	mapTypeId: 'terrain'
-  });
-  // The marker, positioned at positionProvided
-  const marker = new google.maps.Marker({
-    position: positionProvided,
-    map: map,
-  });
+function loadOpenStreetMap() {
+	const getBbox = () => {
+		const xDelta = 0.1925616185095329;
+		const yDelta = 0.3894996643066335;
+		const xMin = latArg - xDelta;
+		const xMax = latArg + xDelta;
+		const yMin = longArg - yDelta;
+		const yMax = longArg + yDelta;
+		return `${yMin},${xMin},${yMax},${xMax}`;
+	};
+	$("#openstreetmapframe").attr('src',`https://www.openstreetmap.org/export/embed.html?bbox=${getBbox()}&layer=mapnik&marker=${latArg},${longArg}`);
+	$("#openstreetmaplink").attr('href',`https://www.openstreetmap.org/?mlat=${latArg}&mlon=${longArg}#map=12/${latArg}/${longArg}&layers=N`)
+}
+
+function resizeiframe() {
+	const yPad = $(".tab-content")[0].getBoundingClientRect().y + 5;
+	$(".tab-pane.active iframe")[0].style.height = `calc(100vh - ${yPad}px)`;
 }
 </script>
 
