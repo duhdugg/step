@@ -704,7 +704,11 @@ var SidebarView = Backbone.View.extend({
 			"&book=" + bookName +
 			"' target='_new'>" +
 			"<button type='button' class='stepButton' ><b>Map</b></button>" +
-			"</a>");
+			"</a>" + "<a href='https://earth.google.com/web/search/" + coordinates + 
+			"/' target='_new'>" +
+			"<button type='button' class='stepButton' ><b>🌐</b></button>" +
+			"</a>"
+                );
 	},
 
 	_relatedNosNotDisplayed: function(relatedNos, detailLex) {
