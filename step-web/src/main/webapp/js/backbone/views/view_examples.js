@@ -273,6 +273,9 @@ var ExamplesView = Backbone.View.extend({
 					'</ul>' +
 				'</div>' +
 			'</div>' +
+			'<div id="hideOnStartupContainer" style="display: none">' +
+				'<button id="hideOnStartupBtn" class="stepButton" style="margin-top: 1rem">Hide on startup</button>' +
+			'</div>' +
 			'<div class="text-muted step-copyright">' +
 				'<span>&copy; <a href="https://stepbibleguide.blogspot.com/p/copyrights-licences.html" target="_blank">STEPBible</a> - 2024</span>' +
 			'</div>' +
@@ -281,7 +284,8 @@ var ExamplesView = Backbone.View.extend({
     events: {
         'click .closeColumn': 'onClickClose',
         'click .accordion-heading': 'onClickHeading',
-		'click .plusminus': 'onClickHeading'
+		'click .plusminus': 'onClickHeading',
+		'click #hideOnStartupBtn': 'onClickHideOnStartup',
     },
     initialize: function () {
         this.render();
@@ -418,6 +422,16 @@ var ExamplesView = Backbone.View.extend({
 		}
         if (step.touchDevice) $(".keyboard_shortcut").hide();
         else $(".keyboard_shortcut").show();
+
+		var stepUsageCountStorageOrCookie = step.util.localStorageGetItem("step.usageCount");
+		var stepUsageCount = parseInt(stepUsageCountStorageOrCookie, 10);
+		if (!stepUsageCount || stepUsageCount <= 30) {
+			$("#hideOnStartupContainer")[0].style.display = "block";
+			$("#hideOnStartupBtn").click(function() {
+				step.util.localStorageSetItem("step.usageCount", 31);
+				$("#welcomeExamples .closeColumn").click();
+			});
+		}
     },
     toggleAccordion: function (index, accordionCount) {
         var query = ".accordion-row[data-row=" + index + "]";
