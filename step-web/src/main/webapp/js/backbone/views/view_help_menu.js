@@ -64,6 +64,7 @@ var ViewHelpMenuOptions = Backbone.View.extend({
                 '&copy; STEPBible, Cambridge <%= new Date().getYear() + 1900 %> </p>' +
                 '</div>' +
 				'<p>' + step.state.getCurrentVersion() + '</p>' +
+				'<p style="white-space: pre">' + step.state.getGitVersionInfo() + '</p>' +
                 '<div class="footer"><button class="btn btn-default btn-sm closeModal stepButton" data-dismiss="modal" ><label><%= __s.ok %></label></button></div>' +
                 '</div>' + //end modal body
                 '</div>' + //end content

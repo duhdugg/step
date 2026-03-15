@@ -59,5 +59,13 @@ step.state = {
             this.version = $("meta[name='step.version']").attr("content");
         }
         return this.version;
+    },
+    getGitVersionInfo: function() {
+        if(this.gitVersionInfo == undefined) {
+            this.gitVersionInfo = Object.entries(
+                window._GIT_VERSION_INFO
+            ).map(function (e) {return e.join(": ")}).join("\n");
+        }
+        return this.gitVersionInfo;
     }
 };

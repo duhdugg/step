@@ -455,6 +455,13 @@
         return true;
     }
 
+    function _LOAD_GIT_VERSION_INFO() {
+        window._GIT_VERSION_INFO = {};
+        $.getSafe("/git-version-info.json", function (data) {
+            Object.assign(window._GIT_VERSION_INFO, data);
+        });
+    }
+
     $(window).on("load", function () {
         if (checkForExampleURL())
             return;
@@ -615,4 +622,6 @@
 	$( window ).resize(function() {
 		step.util.refreshColumnSize();
 	});
+
+    _LOAD_GIT_VERSION_INFO();
 })();
