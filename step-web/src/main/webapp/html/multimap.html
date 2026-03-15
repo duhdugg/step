@@ -74,6 +74,7 @@
 			</ul>
 			<div class="tab-content">
 				<div class="tab-pane fade" id="googlemap">
+					<div><button type="button" class="btn btn-link" onClick="openGoogleEarth();">Open Google Earth</button></div>
 					<div><button type="button" class="btn btn-link" onClick="openGoogleMaps();">Open Google Maps</button></div>
 				</div>
 				<div class="tab-pane fade" id="openstreetmap">
@@ -296,9 +297,6 @@ function setupMap() {
 			resizeiframe();
 		}
 
-		else if (target === "#googlemap")
-			openGoogleMaps();
-
 		else if (target === "#openstreetmap") {
 			loadOpenStreetMap();
 			resizeiframe();
@@ -322,6 +320,10 @@ function updateRedCircle(latArg, longArg, latMax, latMin, longMax, longMin, latR
 				.css("left",leftPixel + "px");
 		}
 	}
+}
+
+function openGoogleEarth() {
+	window.open(`https://earth.google.com/web/search/${latArg},${longArg}/`, "_blank");
 }
 
 function openGoogleMaps() {
