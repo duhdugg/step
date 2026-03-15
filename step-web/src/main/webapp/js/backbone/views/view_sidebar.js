@@ -706,7 +706,7 @@ var SidebarView = Backbone.View.extend({
 			"<button type='button' class='stepButton' ><b>Map</b></button>" +
 			"</a>" + "<a href='https://earth.google.com/web/search/" + coordinates + 
 			"/' target='_new'>" +
-			"<button type='button' class='stepButton' ><b>🌐</b></button>" +
+			"<button type='button' class='stepButton' title='Google Earth'><b>🌐</b></button>" +
 			"</a>"
                 );
 	},
