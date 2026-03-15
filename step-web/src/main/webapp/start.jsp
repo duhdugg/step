@@ -218,10 +218,10 @@
             <div class="navbar-header search-form">
                 <div class="navbar-brand col-xs-12">
                     <span class="hidden-xs title">
-                        <a href="about:blank" class="logo">
+                        <a href="javascript:void(0)" class="logo">
                             <img class="hidden-narrow" src="/step.png" alt="STEP" width="90px" height="22px">
                         </a>
-                        <a href="about:blank" class="logo">
+                        <a href="javascript:void(0)" class="logo">
                             <img class="hidden-not-narrow" src="/images/narrow_step_logo.png" alt="STEP">
                         </a>
                     </span>
