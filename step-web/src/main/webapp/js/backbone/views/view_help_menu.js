@@ -73,6 +73,9 @@ var ViewHelpMenuOptions = Backbone.View.extend({
 			step.util.blockBackgroundScrolling("aboutModal");
     },
     resetEverything: function () {
+	if (!window.confirm("Are you sure you want to reset everything? This cannot be undone")) {
+	    return;
+	}
         window.localStorage.clear();
         $.cookie("lang", "");
 
