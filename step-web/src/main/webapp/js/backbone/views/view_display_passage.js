@@ -950,6 +950,7 @@ var PassageDisplayView = DisplayView.extend({
             this.updateSpecificColor("clrLexiconFocusBG", "#c8d8dc");
             this.updateSpecificColor("clrRelatedWordBg", "#b2e5f3");
             this.updateSpecificColor("clrBackground", "#ffffff");
+            if (step.util.isReaderMode()) document.querySelector(':root').style.setProperty('--clrStrongText', 'var(--clrText)');
             if (step.util.isDarkMode()) $('body,html').css('color-scheme','dark');
             else $('body,html').css('color-scheme','normal');
         },

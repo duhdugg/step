@@ -3531,6 +3531,11 @@ step.util = {
 			if (!step.util.isDarkMode()) setToDarkMode = true;
 		}
 		else setToDarkMode = step.util.isDarkMode();
+		var setToReaderMode = false;
+		if (option === "reader") {
+			if (!step.util.isReaderMode()) setToReaderMode = true;
+		}
+		else setToReaderMode = step.util.isReaderMode();
    		var rootVar = document.querySelector(':root');
         if (setToDarkMode) {
             rootVar.style.setProperty('--clrText',"#BCC0C3");
@@ -3564,11 +3569,16 @@ step.util = {
             $('body,html').css('color-scheme','normal');
             newBtnText = __s.enable;
         }
+        step.settings.save({"readerMode": setToReaderMode});
+        if (setToReaderMode) {
+            rootVar.style.setProperty('--clrStrongText',"var(--clrText)");
+        }
         rootVar.style.setProperty('--clrLexiconFocusBG',"#c8d8dc");
         step.settings.save({"clrLexiconFocusBG":"#c8d8dc"});
         rootVar.style.setProperty('--clrRelatedWordBg',"#b2e5f3");
         step.settings.save({"clrRelatedWordBg":"#b2e5f3"});
         $('#darkModeBtn').text(newBtnText);
+        $('#readerModeBtn').text(newBtnText);
 		if (option !== "close") step.util.showFontSettings();
     },
 	switchColorMode: function () {
@@ -3600,6 +3610,7 @@ step.util = {
 			styleForColorExamples = 'display:none';
 		}
         var darkModeEnabled = step.util.isDarkMode();
+        var readerModeEnabled = step.util.isReaderMode();
 
     	var modalHTML =
       		'<div id="fontSettings" class="modal selectModal" dir="' + (step.state.isLtR() ? "ltr" : "rtl") + '" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">' +
@@ -3924,6 +3935,18 @@ step.util = {
                                         ((darkModeEnabled) ? ' stepPressedButton' : '') +
                                         '" type="button" title="Dark mode" onclick="step.util.setDefaultColor(\'flip\')"><span style="font-size:10px;line-height:12px;font-weight:bold">' +
                                         ((darkModeEnabled) ? __s.disable : __s.enable) +
+                                        '</span></button>' +
+								'</td>' +
+							'</tr>';
+		if ((colorReady))
+			modalHTML +=
+							'<tr>' +
+								'<td class="passageContent defaultfont">' + 'Reader mode' + '</td>' + //  FIXME: Translate
+								'<td class="pull-right">' +
+									'<button id="readerModeBtn" class="btn btn-default btn-sm' +
+                                        ((readerModeEnabled) ? ' stepPressedButton' : '') +
+                                        '" type="button" title="Reader mode" onclick="step.util.setDefaultColor(\'reader\')"><span style="font-size:10px;line-height:12px;font-weight:bold">' +
+                                        ((readerModeEnabled) ? __s.disable : __s.enable) +
                                         '</span></button>' +
 								'</td>' +
 							'</tr>';
@@ -4710,6 +4733,9 @@ step.util = {
 		if ((stepBgColor === "#202124") || (stepBgColor === "rgb(32, 33, 36)")) return true; // old iPad would return the rgb value
 		return false;
 	},
+        isReaderMode: function() {
+                return step.settings.get("readerMode");
+        },
    	formatSearchResultRange: function(origSearchResultRange, moreThanOneStrongSearch) {
 		var searchResultRange = origSearchResultRange;
         var pos1 = searchResultRange.indexOf("@");
