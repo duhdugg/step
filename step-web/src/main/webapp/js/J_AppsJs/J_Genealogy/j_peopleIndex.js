@@ -60,8 +60,6 @@ class _ClassJPeopleTableHandler
         var jsonFileName = 'J_AppsJson/J_Genealogy/j_genealogy.json';
         const urlPart1 = _Utils.getUrlPart1();
         var jsonPath =  urlPart1 + '/html/json/';
-        if (urlPart1.indexOf('localhost') == -1 && urlPart1.indexOf('127.0.0.1') == -1)
-            jsonPath += ('STEP_SERVER_VERSION_TOKEN'.toLowerCase() !== 'step_server_version_token') ? 'STEP_SERVER_VERSION_TOKEN/' : '';
 
 
 
