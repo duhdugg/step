@@ -224,17 +224,106 @@ var StepRouter = Backbone.Router.extend({
 
         var searchType = passageModel.get("searchType");
         if (searchType == 'PASSAGE') {
+            // if passage has not changed, get the verse index
+            var scrollPosVerseIndex = this.getScrollPosVerseIndex(passageModel);
             //destroy all views for this column
             passageModel.trigger("destroyViews");
-            new PassageDisplayView({
+            var passageView = new PassageDisplayView({
                 model: passageModel,
                 partRendered: partRendered
             });
+            // set passage on the element for getScrollPosVerseIndex
+            $(passageView.el).attr("data-osis-id", passageModel.attributes.osisId);
+            if (scrollPosVerseIndex) {
+                this.handleRenderScrollPosition(passageView, scrollPosVerseIndex);
+            }
         } else {
             this.handleSearchResults(passageModel, partRendered);
         }
         this._renderSummary(passageModel);
         step.util.hideNavBarOnPhones(doNotScroll);
+    },
+    getScrollPosVerseIndex: function(passageModel) {
+        var currentPassageID = passageModel.get("passageId");
+        var passageContainer = step.util.getPassageContainer(currentPassageID);
+        // if this is due to an options change, and we are staying on the same
+        // book and chapter, we want to preserve the scrolling position
+        var sameOsisIdAsPrevious = false;
+        var passageContent = passageContainer.find(".passageContent");
+        var previousOsisId = passageContent.attr("data-osis-id");
+        var currentOsisId = passageModel.attributes.osisId;
+        if (previousOsisId == currentOsisId) {
+            sameOsisIdAsPrevious = true;
+        }
+        if (!sameOsisIdAsPrevious) {
+            return null;
+        }
+        // get top-most visible verse
+        // first get the offset of the content holder
+        var contentHolder = passageContainer.find(".passageContentHolder");
+        var contentHolderOffset = contentHolder.offset().top;
+        // if the first element in the contentHolder is within view,
+        // we can just leave the scroll position at the top
+        var firstElement = contentHolder.find(":first");
+        if (firstElement.offset().top >= contentHolderOffset) {
+            return null;
+        }
+        // otherwise, we are looking for the first verse that is within view
+        var selector = this.getVerseElementsFromContentHolder(contentHolder);
+        let verses = contentHolder.find(selector);
+        for (var v = 0; v < verses.length; v++) {
+            var verse = verses[v];
+            if ($(verse).offset().top > contentHolderOffset) {
+                return v;
+            }
+        }
+        return null;
+    },
+    handleRenderScrollPosition: function (passageDisplayView, verseIndex) {
+        var contentHolder = $(passageDisplayView.el).find(".passageContentHolder");
+        var selector = this.getVerseElementsFromContentHolder(contentHolder);
+        var verse = contentHolder.find(selector)[verseIndex];
+        if (!verse) {
+            return;
+        }
+        var contentHolderOffset = contentHolder.offset().top;
+        var offset = $(verse).offset().top - contentHolderOffset - 10;
+        contentHolder[0].scrollTo(0, offset);
+    },
+    getVerseElementsFromContentHolder: function (contentHolder) {
+        if (contentHolder.find(".interlinear").first().length) {
+            return contentHolder.find(".verseNumber");
+        }
+        var firstClass = contentHolder.find(":first").attr("class");
+        if (firstClass.includes("table")) {
+            return contentHolder.find("tr.row").filter(function(e, el) {
+                // ignoring verse-0 in the count for table-based views
+                return e === 0 ? !$(el).find("a.verseLink[name$='.0']").length : true;
+            });
+        } else if (firstClass.includes("verseGrouping")) {
+            return contentHolder.find(".verseGrouping").filter(function(e, el) {
+                // ignoring any verse-0 in the count for interleaved views
+                if (e === 0) {
+                    // if version reference is disabled,
+                    // the first grouping should contain a verseNumber
+                    if (!$(el).find(".verseNumber").first().length) {
+                        return false;
+                    }
+                    // if version reference is enabled,
+                    // we need to inspect the inner HTML of smallResultKey
+                    var keys = $(el).find(".smallResultKey");
+                    for (var k = 0; k < keys.length; k++) {
+                        var key = $(keys[k]);
+                        if (key.html().endsWith(":0)")) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            });
+        } else {
+            return contentHolder.find(".verse");
+        }
     },
 
     _renderSummary: function (passageModel) {
