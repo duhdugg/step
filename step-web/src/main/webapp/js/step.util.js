@@ -2457,9 +2457,9 @@ step.util = {
 									'</label>' +
 								'</div>' +
 							'</div>' +
-						'</span>' +
-						'<br>' +
-						'<div id="displayLocForm" class="form-group" style="clear:both;float:right;font-size:16px">' +
+						'</span>';
+                if (!step.touchDevice) modalHTML += '<br>';
+		modalHTML += '<div id="displayLocForm" class="form-group" style="clear:both;float:right;font-size:16px">' +
 							'<label for="displayLocation"><%= __s.display_passage_at %></label>' +
 							'<select class="stepFgBg" type="text" id="displayLocation">' +
 								'<option value="replace"><%= __s.current_panel %></option>' +
@@ -2467,17 +2467,11 @@ step.util = {
 								'<option id="append_to_panel" value="append"><%= __s.append_to_panel %></option>' +
 							'</select>' +
 						'</div><br>' +
-					'</div>' ;
-		if (!step.touchDevice) modalHTML +=
-						'<textarea id="enterYourPassage" rows="1" class="stepFgBg" style="font-size:13px;width:95%;margin-left:5;resize=none;height:24px" title="<%= __s.type_in_your_passage %>"' +
-						' placeholder="<%= __s.select_passage_input_placeholder %>"></textarea>';
-		modalHTML +=
+					'</div>'  +
+						'<textarea id="enterYourPassage" rows="1" class="stepFgBg" style="font-size:' + (step.touchDevice ? '16px' : '13px') + ';width:calc(100% - 11px);margin-left:5px;margin-top:' + (step.touchDevice ? '7px' : '0') + ';resize:none;height:1.85em;overflow:hidden" title="<%= __s.type_in_your_passage %>"' +
+						' placeholder="' + (step.touchDevice ? '<%= __s.select_passage_input_short_placeholder %>' : '<%= __s.select_passage_input_placeholder %>') + '"></textarea>' +
 					'<div id="bookchaptermodalbody" class="modal-body"></div>' +
-					'<div class="footer">';
-		if (step.touchDevice) modalHTML +=
-						'<textarea id="enterYourPassage" rows="1"  class="stepFgBg" style="font-size:16px;width:80%;margin-left:5;margin-bottom:5;resize=none;height:24px"' +
-						' placeholder="<%= __s.select_passage_input_short_placeholder %>"></textarea>';
-		modalHTML +=
+					'<div class="footer">' +
 						'<br>' +
 						'<span id="userEnterPassageError" style="color: red"></span>' +
 					'</div>' +
