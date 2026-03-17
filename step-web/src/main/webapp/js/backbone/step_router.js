@@ -236,6 +236,7 @@ var StepRouter = Backbone.Router.extend({
             $(passageView.el).attr("data-osis-id", passageModel.attributes.osisId);
             if (scrollPosVerseIndex) {
                 this.handleRenderScrollPosition(passageView, scrollPosVerseIndex);
+                doNotScroll = true;
             }
         } else {
             this.handleSearchResults(passageModel, partRendered);
@@ -265,49 +266,77 @@ var StepRouter = Backbone.Router.extend({
         // if the first element in the contentHolder is within view,
         // we can just leave the scroll position at the top
         var firstElement = contentHolder.find(":first");
-        if (firstElement.offset().top >= contentHolderOffset) {
+        if (firstElement[0].getBoundingClientRect().y >= contentHolderOffset) {
             return null;
         }
         // otherwise, we are looking for the first verse that is within view
-        var selector = this.getVerseElementsFromContentHolder(contentHolder);
-        let verses = contentHolder.find(selector);
+        var verses = this.getVerseElementsFromContentHolder(contentHolder);
+        var topOffset = contentHolderOffset;
+        if (step.touchDevice && !step.touchWideDevice) {
+            var parent = passageContainer[0].parentElement;
+            var passageOptionsGroup = $(parent).find(".passageOptionsGroup");
+            var optionsGroupOffset = passageOptionsGroup[0].clientHeight;
+            topOffset = optionsGroupOffset;
+        }
         for (var v = 0; v < verses.length; v++) {
             var verse = verses[v];
-            if ($(verse).offset().top > contentHolderOffset) {
+            if (verse.getBoundingClientRect().y > topOffset) {
                 return v;
             }
         }
         return null;
     },
     handleRenderScrollPosition: function (passageDisplayView, verseIndex) {
-        var contentHolder = $(passageDisplayView.el).find(".passageContentHolder");
-        var selector = this.getVerseElementsFromContentHolder(contentHolder);
-        var verse = contentHolder.find(selector)[verseIndex];
+        var passageContainer = $(passageDisplayView.el);
+        var contentHolder = passageContainer.find(".passageContentHolder");
+        var verses = this.getVerseElementsFromContentHolder(contentHolder);
+        var verse = verses[verseIndex];
         if (!verse) {
             return;
         }
-        var contentHolderOffset = contentHolder.offset().top;
-        var offset = $(verse).offset().top - contentHolderOffset - 10;
-        contentHolder[0].scrollTo(0, offset);
+        if (step.touchDevice && !step.touchWideDevice) {
+            // mobile needs this to be put behind a timeout
+            // because hideNavBarOnPhones sets height: 'auto' on the contentHolder
+            // scroll to top first to deal with top bar calculation
+            window.scrollTo(0, 0);
+            setTimeout(function() {
+                // mobile should use window.scrollTo
+                var parent = passageContainer[0].parentElement;
+                var passageOptionsGroup = $(parent).find(".passageOptionsGroup");
+                var optionsGroupOffset = passageOptionsGroup[0].clientHeight;
+                var offset = verse.getBoundingClientRect().y - 50;
+                window.scrollTo(0, offset);
+            }, 0);
+        } else {
+            // desktop should just scroll the div
+            var contentHolderOffset = contentHolder.offset().top;
+            var offset = verse.getBoundingClientRect().y - contentHolderOffset - 10;
+            contentHolder[0].scrollTo(0, offset);
+        }
     },
     getVerseElementsFromContentHolder: function (contentHolder) {
         if (contentHolder.find(".interlinear").first().length) {
             return contentHolder.find(".verseNumber");
         }
-        var firstClass = contentHolder.find(":first").attr("class");
+        var firstClass = contentHolder.find("> :not(.notesPane)").first().attr("class");
         if (firstClass.includes("table")) {
             return contentHolder.find("tr.row").filter(function(e, el) {
                 // ignoring verse-0 in the count for table-based views
                 return e === 0 ? !$(el).find("a.verseLink[name$='.0']").length : true;
             });
         } else if (firstClass.includes("verseGrouping")) {
+            var versionReferenceEnabled = (
+                !contentHolder.find(".verseGrouping .verseNumber").first().length
+            );
             return contentHolder.find(".verseGrouping").filter(function(e, el) {
                 // ignoring any verse-0 in the count for interleaved views
                 if (e === 0) {
                     // if version reference is disabled,
                     // the first grouping should contain a verseNumber
-                    if (!$(el).find(".verseNumber").first().length) {
-                        return false;
+                    if (!versionReferenceEnabled) {
+                        if (!$(el).find(".verseNumber").first().length) {
+                            return false;
+                        }
                     }
                     // if version reference is enabled,
                     // we need to inspect the inner HTML of smallResultKey
