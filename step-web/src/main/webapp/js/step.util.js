@@ -2498,12 +2498,11 @@ step.util = {
 			'</div>' +
 		'</div>';
 		$(_.template(modalHTML)()).modal("show");
-		if (!step.touchDevice) {
-			$('textarea#enterYourPassage').focus().val(step.tempKeyInput);
-			step.tempKeyInput = "";
-		}
-		else
+                $('textarea#enterYourPassage').focus().val(step.tempKeyInput);
+                step.tempKeyInput = "";
+		if (step.touchDevice) {
 			step.util.blockBackgroundScrolling("passageSelectionModal");
+		}
   },
 
   copyModal: function () { // Do not shorten name in pom.xml because it is called at start.jsp
