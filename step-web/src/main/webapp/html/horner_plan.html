@@ -276,11 +276,11 @@
           // Start polling...
           checkReady(function ($) {
             $(function () {
-              init(urlPart1);
+              init();
             });
           });
         } else {
-          init(urlPart1);
+          init();
         }
       })();
 
@@ -288,7 +288,7 @@
         return new Date(d.getTime() + window.today.getTimezoneOffset() * 60000);
       }
 
-      function init(urlPart1) {
+      function init() {
         $.ajaxSetup({ async: true });
         var settings = new SettingsModelList();
         settings.fetch();
@@ -300,7 +300,7 @@
         }
         $.ajaxSetup({ async: false });
 
-        initValues(urlPart1);
+        initValues();
         $("form").submit((event) => event.preventDefault());
         $("#startDate").change((event) => {
           if (!event.target.value) {
@@ -330,7 +330,7 @@
         window.location.reload();
       }
 
-      function initValues(urlPart1) {
+      function initValues() {
         var today = new Date();
         today.setHours(0);
         today.setMinutes(0);
@@ -360,7 +360,26 @@
         saveToLocalStorage();
         renderInputValues();
         setCurrentDayCount();
-        renderReadings(urlPart1);
+        renderReadings();
+        initFirstReading();
+      }
+
+      function initFirstReading() {
+        var inIFrame = false;
+        try {
+          inIFrame = window.self !== window.top;
+        } catch (e) {
+          inIFrame = true;
+        }
+        if (!inIFrame) {
+          return;
+        }
+        const readings = getReadings();
+        if (!readings.length) {
+          return;
+        }
+        const first = readings[0];
+        displayPassages(first);
       }
 
       function renderInputValues() {
@@ -449,10 +468,11 @@
         return lists.filter((reading) => !!reading);
       }
 
-      function renderReadings(urlPart1) {
+      function renderReadings() {
         const readings = getReadings();
         if (!readings.length) {
           $("#plan").html("");
+          return;
         }
         $("#plan").html(
           `<ol>${readings.map((reading) => `<li><a class="clickable" href="javascript:;" onclick="displayPassages('${reading}')">${reading}</li></a>`).join("")}</ol>` +
