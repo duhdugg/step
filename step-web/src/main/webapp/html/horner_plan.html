@@ -309,7 +309,7 @@
           }
           window.startDate = utcToLocal(new Date(event.target.value));
           saveToLocalStorage();
-          renderInputValues();
+          setLastMin();
           setCurrentDayCount();
           renderReadings();
         });
@@ -320,11 +320,12 @@
           }
           window.lastDate = utcToLocal(new Date(event.target.value));
           saveToLocalStorage();
-          renderInputValues();
           setCurrentDayCount();
           renderReadings();
         });
         renderInputValues();
+        setLastMin();
+        setStartMax();
         setCurrentDayCount();
         renderReadings();
       }
@@ -356,6 +357,11 @@
               ),
           ),
         );
+        window.minDate = utcToLocal(
+          new Date(window.today.getTime() - 969 * 365 * window.msPerDay),
+        )
+          .toISOString()
+          .split("T")[0];
         window.maxDate = utcToLocal(
           new Date(window.today.getTime() + 969 * 365 * window.msPerDay),
         )
@@ -376,12 +382,17 @@
       }
 
       function renderInputValues() {
-        const startDate = window.startDate;
-        const lastDate = window.lastDate;
-        $("#startDate").val(startDate.toISOString().split("T")[0]);
-        $("#startDate").attr("max", window.today.toISOString().split("T")[0]);
+        $("#startDate").val(window.startDate.toISOString().split("T")[0]);
         $("#lastDate").val(window.lastDate.toISOString().split("T")[0]);
-        $("#lastDate").attr("min", startDate.toISOString().split("T")[0]);
+      }
+
+      function setStartMax() {
+        $("#startDate").attr("min", window.minDate);
+        $("#startDate").attr("max", window.today.toISOString().split("T")[0]);
+      }
+
+      function setLastMin() {
+        $("#lastDate").attr("min", window.startDate.toISOString().split("T")[0]);
         $("#lastDate").attr("max", window.maxDate);
       }
 
