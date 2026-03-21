@@ -238,6 +238,9 @@ var StepRouter = Backbone.Router.extend({
                 this.handleRenderScrollPosition(passageView, scrollPosVerseIndex);
                 doNotScroll = true;
             }
+            if (this._isColumnView(passageModel)) {
+                this._columnViewFixes(passageView);
+            }
         } else {
             this.handleSearchResults(passageModel, partRendered);
         }
@@ -521,5 +524,29 @@ var StepRouter = Backbone.Router.extend({
             }
         });
         return tokens.join(URL_SEPARATOR);
-    }
+    },
+    _isColumnView: function(passageModel) {
+        return (passageModel.get("interlinearMode") || "").includes("COLUMN");
+    },
+    _columnViewFixes: function(passageDisplayView) {
+        // fixes for sticky headers
+        var passageContainer = $(passageDisplayView.el);
+        var contentHolder = passageContainer.find(".passageContentHolder")[0];
+        // remove the padding-top on the passage content holder
+        // so you don't see text floating above small space above th elements
+        contentHolder.style.setProperty("padding-top", 0);
+        // row border fix when there is no Verse 0
+        var numberOfColumns = passageContainer.find(
+            "tbody > tr:first > th, tbody > tr:first > td"
+        ).length;
+        var secondTr = passageContainer.find("tbody > tr")[1];
+        if (!secondTr.className.includes("row")) {
+            var row2Cols = $(secondTr).find("> td, > th");
+            var diff = numberOfColumns - row2Cols.length;
+            if (diff > 0) {
+                var row2a = row2Cols[0];
+                $(row2a).attr("colspan", diff + 1);
+            }
+        }
+    },
 });

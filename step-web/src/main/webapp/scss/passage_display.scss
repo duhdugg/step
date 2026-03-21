@@ -18,6 +18,25 @@
     display: inline;
     font-size: inherit;
     margin-bottom: 0px;
+    > tbody {
+      > tr:not(.row):first-child {
+        // sticky headers
+        position: sticky;
+        top: 0;
+        // fake border
+        box-shadow: inset 0px -1px var(--clrHighlight);
+        > th {
+          background-color: var(--clrBackground);
+        }
+      }
+      > tr:not(.row):nth-child(2) {
+        > td, > th {
+          // workaround for sticky header box-shadow not appearing due to border: none
+          // on following row
+          border-top: 1px solid transparent !important;
+        }
+      }
+    }
     tr.row {
       &:before, &:after {
         display: none;
