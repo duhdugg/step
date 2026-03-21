@@ -22,7 +22,7 @@ var StepRouter = Backbone.Router.extend({
         this.navigate(url, { trigger: false, replace: true});
     },
 
-    navigatePreserveVersions: function (partial, stripCommentaries, skipPage, skipQFilter, startNewPageForPhone) {
+    navigatePreserveVersions: function (partial, stripCommentaries, skipPage, skipQFilter, startNewPageForPhone, verseNum) {
         //get versions of current active passage
         //add versions from current active passage
         var activePassage = step.util.activePassage();
@@ -52,7 +52,7 @@ var StepRouter = Backbone.Router.extend({
 		skipQFilter = (skipQFilter) ? true : false;
         if ((allVersions !== "") && (searchParameters !== "")) searchParameters = allVersions + URL_SEPARATOR + searchParameters;
         if (step.touchDevice && !step.touchWideDevice && startNewPageForPhone)
-            window.open("/?q=" + searchParameters.split(" ")[0], "_blank");
+            window.open("/?q=" + searchParameters.split(" ")[0] + (verseNum ? ("#scrollToVerseNum=" + verseNum) : "") , "_blank");
         else
             this.navigateSearch(searchParameters, skipQFilter, skipPage);
     },
@@ -248,6 +248,18 @@ var StepRouter = Backbone.Router.extend({
         step.util.hideNavBarOnPhones(doNotScroll);
     },
     getScrollPosVerseIndex: function(passageModel) {
+        // check sessionStorage (if ref link was opened on mobile)
+        if (sessionStorage.scrollToVerseNum) {
+            var scrollToVerseNum = Number(sessionStorage.scrollToVerseNum);
+            delete sessionStorage.scrollToVerseNum;
+            if (!isNaN(scrollToVerseNum)) {
+                if (scrollToVerseNum === 0) {
+                    return 0;
+                } else if (scrollToVerseNum >= 1) {
+                    return scrollToVerseNum - 1;
+                }
+            }
+        }
         var currentPassageID = passageModel.get("passageId");
         var passageContainer = step.util.getPassageContainer(currentPassageID);
         // if this is due to an options change, and we are staying on the same

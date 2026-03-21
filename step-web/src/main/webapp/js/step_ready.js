@@ -472,6 +472,11 @@
 
         //first of all, if we have a fragment, let's get rid of it
         if ((window.location.hash || "").indexOf("#") != -1) {
+            // save scrollToVerseNum first if it's there
+            // (needed for scroll to verse on mobile)
+            if (window.location.hash.indexOf("#scrollToVerseNum") === 0) {
+                sessionStorage.scrollToVerseNum = window.location.hash.split("#scrollToVerseNum=")[1];
+            }
             window.location.hash = "";
         }
         window.step = window.step || {};

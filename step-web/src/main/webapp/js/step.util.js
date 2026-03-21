@@ -736,6 +736,8 @@ step.util = {
 			activePassage.save({ targetLocation: verseRef }, { silent: true });
 		}
 
+        var parts = verseRef.split(".");
+        var verseNum = parts.length === 3 ? parts[2] : undefined;
         var chapterRef = verseRef.substr(0, verseRef.lastIndexOf("."));
         if (step.util.isBlank(chapterRef)) {
             chapterRef = verseRef;
@@ -745,7 +747,7 @@ step.util = {
 			var numOfChaptersInBook = step.passageSelect.getNumOfChapters(bookName);
 			if (numOfChaptersInBook == 1) chapterRef = bookName;
 		}
-        step.router.navigatePreserveVersions("reference=" + chapterRef, stripCommentaries, null, null, true);
+        step.router.navigatePreserveVersions("reference=" + chapterRef, stripCommentaries, null, null, true, verseNum);
 
         //we prevent the event from bubbling up to set the passage id, as we expect a new passage to take focus
         if (ev) ev.stopPropagation();
