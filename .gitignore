@@ -18,3 +18,7 @@ bin
 *-SNAPSHOT*.min.js
 .sass-cache/
 .DS_Store
+!step-wasm/target/step-engine.js
+!step-wasm/target/step-engine.js.wasm
+!step-wasm/target/step-engine.js.wat
+step-wasm/tmp

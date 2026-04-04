@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="/target/step-engine.js"></script>
+</head>
+<body style="font-family: sans-serif; padding: 20px;">
+    <h2>WASM Sync-Bridge Proof</h2>
+    <button id="setup">1. Load OPFS to Memory</button>
+    <button id="run">2. Run Java (Native JS Call)</button>
+    <div id="out" style="margin-top:15px; background:#eee; padding:10px; white-space:pre-wrap;"></div>
+
+    <script>
+        const out = document.getElementById('out');
+        const memoryCache = new Map();
+
+        // This is the function the Java @JS annotation calls
+        globalThis.getFromOPFS = (fileName) => {
+            console.log("Java called globalThis.getFromOPFS for:", fileName);
+            return memoryCache.get(fileName) || "FILE_NOT_FOUND";
+        };
+
+        GraalVM.run([]).then(() => {
+            out.innerText = "Engine Loaded.\n";
+        });
+
+        async function getHomesFiles() {
+            let response = await fetch("http://localhost:8989/rest/module/listHomes");
+            console.debug({response});
+        }
+
+        document.getElementById('setup').onclick = async () => {
+            const root = await navigator.storage.getDirectory();
+            const handle = await root.getFileHandle("ESV.txt", { create: true });
+            const stream = await handle.createWritable();
+            await stream.write("In the beginning God created the heaven and the earth.");
+            await stream.close();
+
+            const file = await handle.getFile();
+            memoryCache.set("ESV.txt", await file.text());
+            out.innerText += "ESV.txt pre-loaded into JS memory.\n";
+        };
+
+        document.getElementById('run').onclick = () => {
+            try {
+                // Call Java, which calls JS, which returns to Java, which returns to here.
+                const result = globalThis.getVerse("ESV", "Gen 1:1");
+                out.innerText += "Result: " + result + "\n";
+            } catch (e) {
+                out.innerText += "Error: " + e.message + "\n";
+            }
+        };
+    </script>
+</body>
+</html>

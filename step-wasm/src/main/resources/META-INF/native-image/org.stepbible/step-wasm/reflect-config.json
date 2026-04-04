@@ -1,0 +1,154 @@
+[
+  {
+    "name": "org.crosswire.jsword.book.sword.SwordBookDriver",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.crosswire.jsword.book.filter.plaintext.PlainTextFilter",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.crosswire.jsword.book.filter.osis.OSISFilter",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.crosswire.jsword.book.filter.thml.THMLFilter",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.crosswire.jsword.book.filter.gbf.GBFFilter",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.crosswire.jsword.JSMsg",
+    "allDeclaredConstructors": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "org.crosswire.jsword.book.readings.ReadingsBookDriver",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.crosswire.jsword.book.sword.ConfigEntry$CustomHandler",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.crosswire.jsword.book.filter.gbf.GBFFilter",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.crosswire.jsword.book.filter.thml.THMLFilter",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.tyndalehouse.step.core.service.impl.PassageOptionsValidationServiceImpl",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.crosswire.jsword.versification.custom.V11nTmp",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredFields": true,
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "org.crosswire.jsword.versification.custom.sbook",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredFields": true,
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "java.util.ArrayList",
+    "allPublicConstructors": true,
+    "methods": [{ "name": "<init>", "parameterTypes": [] }]
+  },
+  {
+    "name": "java.lang.Object[]",
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.crosswire.jsword.book.sword.ZTextBackend",
+    "allDeclaredConstructors": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "org.crosswire.jsword.book.sword.ZTextBackend$ZKeyData",
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "org.crosswire.jsword.book.sword.BlockType",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.tyndalehouse.step.core.exceptions.TranslatedException",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.tyndalehouse.step.core.exceptions.StepInternalException",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.crosswire.jsword.book.sword.ZTextBackend",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.crosswire.jsword.book.sword.ConfigEntryFactory",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.crosswire.jsword.passage.BitwisePassage",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.crosswire.jsword.passage.RangedPassage",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  { "name": "org.jdom2.Document", "allPublicMethods": true },
+  { "name": "org.jdom2.Element", "allPublicMethods": true },
+  {
+    "name": "com.tyndalehouse.step.core.models.OsisWrapper",
+    "allPublicFields": true,
+    "allPublicMethods": true,
+    "allDeclaredConstructors": true
+  },
+  {
+    "name": "com.tyndalehouse.step.core.models.LookupOption",
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.tyndalehouse.step.core.models.TrimmedLookupOption",
+    "allPublicFields": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.apache.lucene.analysis.KeywordAnalyzer",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.apache.lucene.analysis.standard.StandardAnalyzer",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.tyndalehouse.step.core.data.processors.MorphologyProcessor",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true
+  }
+]
