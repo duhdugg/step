@@ -1553,7 +1553,7 @@ step.util = {
          * called when click on a piece of text.
          */
         showDef: function (source, sourceVersion) {
-            var strong, morph, ref, version, allVersions, variant, morphCount;
+            var strong, morph, ref, version, allVersions, variant, morphCount, clickedSurfaceForm;
             if (typeof source === "string") {
                 strong = source;
 				if (typeof sourceVersion === "string")
@@ -1579,13 +1579,15 @@ step.util = {
 				if (version === '')
 	                version = firstVersion;
 				allVersions = firstVersion + "," + step.passages.findWhere({ passageId: step.passage.getPassageId(s) }).get("extraVersions");
+				if (strong && strong.charAt(0) === "G" && step.keyedVersions[version] && step.keyedVersions[version].languageCode === "grc")
+					clickedSurfaceForm = s.text().trim().replace(/^[^\u0370-\u03FF\u1F00-\u1FFF]+|[^\u0370-\u03FF\u1F00-\u1FFF]+$/g, "");
 				step.historyMorph = [];
 				step.historyStrong = [];
 			}
 			variant = variant || "";
-            step.util.ui.initSidebar('lexicon', { strong: strong, morph: morph, ref: ref, variant: variant, version: version, allVersions: allVersions, morphCount: morphCount });
+            step.util.ui.initSidebar('lexicon', { strong: strong, morph: morph, ref: ref, variant: variant, version: version, allVersions: allVersions, morphCount: morphCount, clickedSurfaceForm: clickedSurfaceForm });
             require(["sidebar"], function (module) {
-                step.util.ui.openStrongNumber(strong, morph, ref, version, allVersions, variant, morphCount);
+                step.util.ui.openStrongNumber(strong, morph, ref, version, allVersions, variant, morphCount, clickedSurfaceForm);
             });
         },
         initSidebar: function (mode, data) { // Do not shorten name in pom.xml because it is called at start.jsp
@@ -1606,7 +1608,8 @@ step.util = {
                         version: data.version,
 						allVersions: data.allVersions,
                         mode: mode == null ? 'analysis' : mode,
-						morphCount: data.morphCount
+						morphCount: data.morphCount,
+						clickedSurfaceForm: data.clickedSurfaceForm
                     });
                     new SidebarList().add(step.sidebar);
                     new SidebarView({
@@ -1625,7 +1628,7 @@ step.util = {
                 }
             });
         },
-        openStrongNumber: function (strong, morph, reference, version, allVersions, variant, morphCount) {
+        openStrongNumber: function (strong, morph, reference, version, allVersions, variant, morphCount, clickedSurfaceForm) {
 			if (step.sidebar != null) {
 				if (!step.touchDevice || step.touchWideDevice)
 					step.sidebar.save({
@@ -1636,7 +1639,8 @@ step.util = {
 						version: version,
 						allVersions: allVersions,
 						variant: variant,
-						morphCount: morphCount
+						morphCount: morphCount,
+						clickedSurfaceForm: clickedSurfaceForm || ""
 					});
 				else
 					step.sidebar = null;
