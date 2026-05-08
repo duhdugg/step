@@ -1,7 +1,7 @@
 set -euxo pipefail
 
-URL="http://10.2.0.4:8001/step-debian-arm64.tar.gz"
-TARBAL_CHECKSUM="2e3fb85a004017b4b2950e22f72099e2793dbc73591f5df22669fc24dfe81a75"
+URL="https://github.com/duhdugg/step/releases/download/termux-0.0.1/step-debian-arm64.tar.gz"
+TARBAL_CHECKSUM="18efb5770292129da51901bf8b8a77215e04f6cd0a0d17db2f6ed0105576a311"
 STEP_DIR="$PREFIX/var/lib/proot-distro/installed-rootfs/debian/opt/step"
 
 function _step_install_dependencies {
@@ -24,7 +24,7 @@ function _step_attempt_homes_restore {
 }
 
 function _step_dl_tarball {
-  curl -o step-debian-arm64.tar.gz "$URL"
+  curl -L -o step-debian-arm64.tar.gz "$URL"
   sha256sum step-debian-arm64.tar.gz | grep "$TARBAL_CHECKSUM"
 }
 
