@@ -1120,6 +1120,7 @@ step.util = {
         var otherVersions = allVersions.slice(1);
 		if (!step.util.checkFirstBibleHasPassageBeforeSwap(newMasterVersion, passageModel, otherVersions)) return;
         passageModel.save({ args: newArgs, masterVersion: masterVersion, otherVersions: otherVersions }, { silent: silent });
+		step.util.incrementLocalStorage("step.interlinearTutorial");
     },
     ui: {
         selectMark: function (classes) {
@@ -1591,6 +1592,12 @@ step.util = {
             });
         },
         initSidebar: function (mode, data) { // Do not shorten name in pom.xml because it is called at start.jsp
+			if (mode === 'color') {
+				if ($('#colorgrammar-icon').attr('title') === 'Color code grammar is available') {
+					step.util.orderBibleButton('color');
+					return;
+				} 
+			}
 			$(".colorOffWarning").remove();
             require(["sidebar"], function (module) {
                 if (!data) {
@@ -2709,9 +2716,18 @@ step.util = {
 		step.util.blockBackgroundScrolling("searchSelectionModal");
 		$('textarea#userTextInput').focus();
     },
+	incrementLocalStorage: function(name) {
+		var introCountFromStorageOrCookie = step.util.localStorageGetItem(name);
+		var introCount = parseInt(introCountFromStorageOrCookie, 10);
+		if (isNaN(introCount)) introCount = 0;
+		introCount ++;
+		step.util.localStorageSetItem(name, introCount);
+	},
 	showVideoModal: function (videoFile, seconds) {
         var element = document.getElementById('videoModal');
         if (element) element.parentNode.removeChild(element);
+		if ((videoFile === "OHB_ESV_Gen1.gif") || (videoFile === "KJV_THGNT_John1.gif"))
+			step.util.incrementLocalStorage("step.interlinearTutorial");
         $(_.template(
 			'<div id="videoModal" class="modal selectModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-videofile="' + videoFile + '" data-videotime="' + seconds + '">' +
 				'<div class="modal-dialog">' +
@@ -4066,6 +4082,46 @@ step.util = {
             new PickBibleView({model: step.settings, searchView: self});
         });
     },
+	orderBibleButton: function (colorMode) {
+		if (colorMode !== 'color')
+			colorMode = "";
+        element = document.getElementById('orderVersionModal');
+        if (element) element.parentNode.removeChild(element);
+
+		var jsVersion = ($.getUrlVars().indexOf("debug") > -1) ? "" : step.state.getCurrentVersion() + ".min.";
+		$('<div id="orderVersionModal" class="modal selectModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">' +
+			'<div class="modal-dialog">' +
+				'<div class="modal-content stepModalFgBg">' +
+					'<style>' +
+						'#nestedVersion div, .nested-1 {' +
+							'margin-top: 5px;' +
+						'}' +
+						'.nested-1 {' +
+							'background-color: #e6e6e6;' +
+						'}' +
+					'</style>' +  
+					'<div class="modal-header">' +
+						step.util.modalCloseBtn(null, "userCloseVersionOrder") +
+					'</div>' +
+					'<div class="modal-body">' +
+						'<div id="sortVersionModal"></div>' +
+							'<div class="footer">' +
+								'<button id="updateVersionOrderButton" class="btn btn-default btn-xs closeModal stepButton pull-right" onclick=saveVersionOrder()><label>Update order</label></button>' +
+								'<br>' +
+							'</div>' +
+						'</div>' +
+					'</div>' +
+				'</div>' +
+				'<script src="js/order_version.' + jsVersion + 'js"></script>' +
+				'<script src="libs/Sortable.min.js"></script>' +
+				'<script>' +
+					'$( document ).ready(function() {' +
+						'init_order_version("' + colorMode + '");' +
+					'});' +
+				'</script>' +
+			'</div>' +
+		'</div>').modal("show");;
+    },
 	setClassicalUI: function (classicalUI) {
 		if (classicalUI) {
 			$('#top_input_area').show();
@@ -4080,14 +4136,19 @@ step.util = {
 			$('#classicalUICheck').hide();
 		}
 	},
-	showIntroJS: function(element, introMsg, position, width, localStorageName, skipTouchScreen) {
+	showIntroJS: function(element, introMsg, position, width, localStorageName, skipTouchScreen, showNumOfTimes, sleepTime) {
 		if ((skipTouchScreen && step.touchDevice) || (window.innerWidth < width))
 			return false;
 	    var introCountFromStorageOrCookie = step.util.localStorageGetItem(localStorageName);
 		var introCount = parseInt(introCountFromStorageOrCookie, 10);
 		if (isNaN(introCount)) introCount = 0;
-		if ((introCount < 1) && ($(element).is(":visible"))) {
-			step.util.localStorageSetItem(localStorageName, 1);
+		if (!showNumOfTimes || isNaN(showNumOfTimes))
+			showNumOfTimes = 1;
+		if (!sleepTime || isNaN(sleepTime))
+			sleepTime = 800;
+		if ((introCount < showNumOfTimes) && ($(element).is(":visible"))) {
+			introCount ++;
+			step.util.localStorageSetItem(localStorageName, introCount);
 			var introJsSteps = [
 				{
 					element: element,
@@ -4099,10 +4160,25 @@ step.util = {
 				introJs().setOptions({
 					steps: introJsSteps
 				}).start();
-			}, 800);
+			}, sleepTime);
 			return true;
 		}
 		return false;
+	},
+	showBibleOrderForInterlinear: function (timeCalled) { // Wait for element to exist.
+		var element = document.querySelector('.passageContainer.active').querySelector('.interVerseNumbers');
+		if (element != null) // Element is loaded.
+			step.util.showIntroJS(element,
+				"The first Bible determines the word order in interlinear mode.  " +
+				'<a class="videoGuide" href="javascript:step.util.showVideoModal(\'OHB_ESV_Gen1.gif\', 40)"><br>Video guide' +
+				'<span class="glyphicon glyphicon-play-circle" style="font-size:16px;font-family:Glyphicons Halflings"></span>' +
+				'</a> to change word order.',
+				'right', 400, 'step.interlinearTutorial', false, 3, 100);
+		else if (new Date().getTime() - timeCalled < 10000) { // Only call itself within 10 seconds of initial call
+			setTimeout(function() { // Repeat every 450ms.
+				step.util.showBibleOrderForInterlinear(timeCalled)
+			}, 450);
+		}
 	},
 	showIntro: function (showAnyway) {
 		if ((!showAnyway) && (($.getUrlVars().indexOf("skipwelcome") > -1) || (step.state.isLocal()))) return;
@@ -4148,8 +4224,7 @@ step.util = {
 						'Color code grammar is available with a new user interface.',
 						'left', 499, 'step.colorgrammar'))
 						if (!step.util.showIntroJS(document.querySelector('#copy-icon'),
-							__s.copy_intro,
-							'left', 499, 'step.copyIntro'))
+							__s.copy_intro, 'left', 499, 'step.copyIntro'))
 								step.util.showIntroJS(document.querySelector('#summbutton'),
 									"For commentaries from ICC and The Gospel Coalition, click on Summary and then Commentaries",
 									'bottom', 499, 'step.commentaryIntro');

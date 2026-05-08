@@ -9,7 +9,7 @@ var DisplayView = Backbone.View.extend({
         versionLinks.not(disabled).click(function() {
             var el = $(this);
             var newMasterVersion = el.attr("data-version");
-            var newArgs = step.util.swapMasterVersion(newMasterVersion, self.model, false);
+            step.util.swapMasterVersion(newMasterVersion, self.model, false);
         }).attr("title", __s.interlinear_swap_master_version);
     },
     /**

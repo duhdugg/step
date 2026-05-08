@@ -99,9 +99,10 @@ public class JSwordSearchServiceImpl implements JSwordSearchService {
             //TODO: improvement investigate which is faster
             if(searchOnTaggedText) {
                 //then we only do the search if the bible is tagged
-                if(!this.metadataService.supportsStrongs(bible)) {
+                if (!this.metadataService.supportsStrongs(bible))
                     continue;
-                }
+                else if (bible.getInitials().equals("NIV_tagged") && currentSearch.getType().isHebrew()) // NIV OT does not have Strong tags so use ESV indexes
+                    continue;
             }
 
             doSearch(modifier, resultsPerVersion, currentSearch, bible);
