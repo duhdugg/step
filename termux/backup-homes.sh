@@ -5,7 +5,7 @@ STEP_DIR="$DEBIAN_PROOT_DIR/opt/step"
 
 function _step_attempt_homes_backup {
   if test -d "$STEP_DIR"; then
-    tar -caf ~/step-homes-backup.tar.gz -C "$STEP_DIR" homes
+    tar -caf ~/step-homes-backup-$(date +%F).tar -C "$STEP_DIR" homes
   fi
 }
 
