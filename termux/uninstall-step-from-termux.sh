@@ -5,6 +5,8 @@ DEBIAN_PROOT_DIR="$PROOT_DIR/debian"
 STEP_DIR="$DEBIAN_PROOT_DIR/opt/step"
 STEP_BIN="/data/data/com.termux/files/usr/bin/step"
 
+export APT_LISTCHANGES_FRONTEND=none
+export DEBIAN_FRONTEND=noninteractive
 
 function _step_delete_step_debian_proot_if_present {
   if test -d "$DEBIAN_PROOT_DIR"; then
@@ -39,7 +41,8 @@ function _step_uninstall_proot_distro_if_unused {
 }
 
 function _step_uninstall_proot_distro {
-  pkg uninstall -y proot-distro
+  apt remove -y proot-distro
+  apt autoremove -y
 }
 
 function _step_main_uninstall {

@@ -5,6 +5,9 @@ TARBAL_CHECKSUM="18efb5770292129da51901bf8b8a77215e04f6cd0a0d17db2f6ed0105576a31
 DEBIAN_PROOT_DIR="$PREFIX/var/lib/proot-distro/installed-rootfs/debian"
 STEP_DIR="$DEBIAN_PROOT_DIR/opt/step"
 
+export APT_LISTCHANGES_FRONTEND=none
+export DEBIAN_FRONTEND=noninteractive
+
 function _step_check_for_existing_non_step_debian_proot {
   if test -d "$DEBIAN_PROOT_DIR"; then
     if test -d "$STEP_DIR"; then
@@ -17,8 +20,8 @@ function _step_check_for_existing_non_step_debian_proot {
 }
 
 function _step_install_dependencies {
-  pkg update
-  pkg install proot-distro
+  apt update -y
+  apt install -y proot-distro
 }
 
 function _step_attempt_homes_backup {
