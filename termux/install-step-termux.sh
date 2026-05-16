@@ -1,7 +1,7 @@
 set -euxo pipefail
 
-URL="https://github.com/duhdugg/step/releases/download/termux-0.0.1/step-debian-arm64.tar.gz"
-TARBAL_CHECKSUM="18efb5770292129da51901bf8b8a77215e04f6cd0a0d17db2f6ed0105576a311"
+URL="https://github.com/duhdugg/step/releases/download/step-26.5.2-termux/step-26.5.2-debian-arm64.tar.gz"
+TARBAL_CHECKSUM="e67419c966aba20d839990b6d210a4940fc7390162e587ebb6965e279baba875"
 DEBIAN_PROOT_DIR="$PREFIX/var/lib/proot-distro/installed-rootfs/debian"
 STEP_DIR="$DEBIAN_PROOT_DIR/opt/step"
 
