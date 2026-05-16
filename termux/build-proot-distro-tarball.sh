@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-docker buildx build --platform linux/arm64 -t step-debian-arm64 .
+docker buildx build --network=host --platform linux/arm64 -t step-debian-arm64 .
 docker create --name step-debian-arm64 --platform linux/arm64 step-debian-arm64
 
 mkdir -p ./cache
