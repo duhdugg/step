@@ -1,8 +1,8 @@
 FROM --platform=linux/arm64 debian:trixie-slim
 ENV DEBIAN_FRONTEND="noninteractive"
-ENV DESKTOPVERSION="26_1_2"
-ENV DESKTOPCHECKSUM="619ebcef68c40fd0199ebefbefa499fa5c8ba7ca6692bc2103d9b62994e0f37d"
-ENV BASE_DESKTOPURL="https://downloads.stepbible.com/file/Stepbible"
+ENV DESKTOPVERSION="26_5_2"
+ENV DESKTOPCHECKSUM="5c72c3c62f89014a636e23ff1e605e529cb193062741a80a3907ec3806f63990"
+ENV BASE_DESKTOPURL="https://dev.stepbible.org/downloads"
 
 RUN apt update -y
 RUN apt upgrade -y
