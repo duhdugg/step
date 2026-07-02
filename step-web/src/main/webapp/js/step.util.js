@@ -5670,16 +5670,14 @@ step.util = {
 		});
 	},
 	checkGreekAltMorph: function(strong, morphCode, greekWord, versionOfGreek) {
-		greekWord = greekWord.replace(/^[\[(12>᾽]+/g, "").replace(/[᾽´ι,—;·.\]\s)⸃⸅]+$/g, "").toLowerCase();
-		var firstLetter = step.util.translateGreekChar2Eng(greekWord);
-		$.getJSON('/html/json/AltMorph/NoAltGreek/' + firstLetter + '.json', function(data) {
+		greekWord = greekWord.replace(/^[\[(12>᾽]+/g, "").replace(/[᾽´ι,—;;··.\]\s)⸃⸅]+$/g, "").toLowerCase(); // The repeated characters are different characters.
+		$.getJSON('/html/json/AltMorph/NoAltGreek/notunique.json', function(data) {
 			if (typeof data !== "object" || !Array.isArray(data))
 				return;
 			var left = 0;
 			var right = data.length -1;
 			while (left <= right) {
-				// Bitwise right shift to find mid.  Same as divide by 2 with no remainder.
-				var mid = (left + right) >> 1; 
+				var mid = (left + right) >> 1; // Bitwise right shift to find mid.  Same as divide by 2 with no remainder.
 				var currentElement = data[mid];
 				if (currentElement === greekWord)
 					return; // greekWord found, word has no morph
@@ -5688,27 +5686,41 @@ step.util = {
 				else
 					right = mid - 1; // Narrow search to the left half
 			}
-			versionOfGreek = versionOfGreek.toLowerCase();
-			if ((versionOfGreek === "byz") || (versionOfGreek === "sblg") || (versionOfGreek === "thgnt"))
-				step.util.addAltMorphLink(strong, morphCode, greekWord);
-			else
-				step.util.checkStrongAltMorph(strong, morphCode, greekWord);
+			var greekNoAccent = greekWord.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+			var firstLetter = step.util.translateGreekChar2Eng(greekNoAccent.substring(0,1));
+			$.getJSON('/html/json/AltMorph/NoAltGreek/' + firstLetter + '.json', function(data) {
+				var searchWord = greekNoAccent.substring(1); // All words in json file starts with the same first letter.  Therefore, the first character is not in the file.
+				if (typeof data !== "object" || !Array.isArray(data))
+					return;
+				var left = 0;
+				var right = data.length -1;
+				while (left <= right) { // Bitwise right shift to find mid.  Same as divide by 2 with no remainder.
+					var mid = (left + right) >> 1; 
+					var currentElement = data[mid];
+					if (currentElement === searchWord)
+						return; // greekWord found, word has no morph
+					else if (currentElement < searchWord)
+						left = mid + 1; // Narrow search to the right half
+					else
+						right = mid - 1; // Narrow search to the left half
+				}
+				versionOfGreek = versionOfGreek.toLowerCase();
+				if ((versionOfGreek === "byz") || (versionOfGreek === "sblg") || (versionOfGreek === "thgnt"))
+					step.util.addAltMorphLink(strong, morphCode, greekWord);
+				else
+					step.util.checkStrongAltMorph(strong, morphCode, greekWord);
+			});
 		});
 	},
-    translateGreekChar2Eng: function (str) {
+    translateGreekChar2Eng: function (firstChar) {
         greekMap = {'α': 'a', 'β': 'b', 'ξ': 'c', 'δ': 'd', 'ε': 'e', 'φ': 'f',
                     'γ': 'g', 'η': 'h', 'ι': 'i', 'κ': 'k', 'λ': 'l', 'μ': 'm',
                     'ν': 'n', 'ο': 'o', 'π': 'p', 'θ': 'q', 'ρ': 'r', 'σ': 's',
                     'τ': 't', 'υ': 'u', 'ω': 'w', 'Ω': 'w', 'χ': 'x', 'ψ': 'y',
                     'ζ': 'z'};
-        // Replace each Greek character with its English equivalent
-        var decomposed = str.normalize('NFD');
-        // 2. \p{Mn}: Matches the non-spacing combining marks (U+0300–U+036F)
-        var regExPattern = "\\/\\\p{Mn}\\/gu"; // Need to put this in a variable because maven minifier does not recognize the "u" (unicode) option which was introduced in ES2015.
-        var firstChar = decomposed.replace(regExPattern, "").substring(0,1);
         if (greekMap[firstChar])
             return greekMap[firstChar];
-        console.log("unrecognized first char " + firstChar + " in " + str);
+        console.log("unrecognized first char " + firstChar);
         return firstChar;
     },
 	addAltMorphLink: function (strong, morphCode, greekWord) {
