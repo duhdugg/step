@@ -5670,7 +5670,7 @@ step.util = {
 		});
 	},
 	checkGreekAltMorph: function(strong, morphCode, greekWord, versionOfGreek) {
-		greekWord = greekWord.replace(/^[\[(12>᾽]+/g, "").replace(/[᾽´ι,—;;··.\]\s)⸃⸅]+$/g, "").toLowerCase(); // The repeated characters are different characters.
+		greekWord = greekWord.replace(/^[\[(12>]+/g, "").replace(/[´ι,—;;··.\]\s)⸃⸅]+$/g, "").toLowerCase(); // The repeated characters are different characters.
 		$.getJSON('/html/json/AltMorph/NoAltGreek/notunique.json', function(data) {
 			if (typeof data !== "object" || !Array.isArray(data))
 				return;
