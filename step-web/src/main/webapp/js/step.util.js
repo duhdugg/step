@@ -5671,7 +5671,8 @@ step.util = {
 	},
 	checkGreekAltMorph: function(strong, morphCode, greekWord, versionOfGreek) {
 		greekWord = greekWord.replace(/^[\[(12>]+/g, "").replace(/[´ι,—;;··.\]\s)⸃⸅]+$/g, "").toLowerCase(); // The repeated characters are different characters.
-		$.getJSON('/html/json/AltMorph/NoAltGreek/notunique.json', function(data) {
+		var folderName = (versionOfGreek === "LXX") ? "LXX" : "nt";
+		$.getJSON('/html/json/AltMorph/NoAltGreek/' + folderName + '/notunique.json', function(data) {
 			if (typeof data !== "object" || !Array.isArray(data))
 				return;
 			var left = 0;
@@ -5688,7 +5689,7 @@ step.util = {
 			}
 			var greekNoAccent = greekWord.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 			var firstLetter = step.util.translateGreekChar2Eng(greekNoAccent.substring(0,1));
-			$.getJSON('/html/json/AltMorph/NoAltGreek/' + firstLetter + '.json', function(data) {
+			$.getJSON('/html/json/AltMorph/NoAltGreek/' + folderName + '/' + firstLetter + '.json', function(data) {
 				var searchWord = greekNoAccent.substring(1); // All words in json file starts with the same first letter.  Therefore, the first character is not in the file.
 				if (typeof data !== "object" || !Array.isArray(data))
 					return;
@@ -5704,11 +5705,7 @@ step.util = {
 					else
 						right = mid - 1; // Narrow search to the left half
 				}
-				versionOfGreek = versionOfGreek.toLowerCase();
-				if ((versionOfGreek === "byz") || (versionOfGreek === "sblg") || (versionOfGreek === "thgnt"))
-					step.util.addAltMorphLink(strong, morphCode, greekWord);
-				else
-					step.util.checkStrongAltMorph(strong, morphCode, greekWord);
+				step.util.addAltMorphLink(strong, morphCode, greekWord);
 			});
 		});
 	},
@@ -5717,7 +5714,7 @@ step.util = {
                     'γ': 'g', 'η': 'h', 'ι': 'i', 'κ': 'k', 'λ': 'l', 'μ': 'm',
                     'ν': 'n', 'ο': 'o', 'π': 'p', 'θ': 'q', 'ρ': 'r', 'σ': 's',
                     'τ': 't', 'υ': 'u', 'ω': 'w', 'Ω': 'w', 'χ': 'x', 'ψ': 'y',
-                    'ζ': 'z'};
+                    'ζ': 'z', '᾽': '᾽'};
         if (greekMap[firstChar])
             return greekMap[firstChar];
         console.log("unrecognized first char " + firstChar);
