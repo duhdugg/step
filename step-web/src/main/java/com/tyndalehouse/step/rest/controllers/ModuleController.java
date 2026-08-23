@@ -5,6 +5,7 @@ import com.tyndalehouse.step.core.data.EntityDoc;
 import com.tyndalehouse.step.core.exceptions.UserExceptionType;
 import com.tyndalehouse.step.core.models.BibleInstaller;
 import com.tyndalehouse.step.core.models.BibleVersion;
+import com.tyndalehouse.step.core.models.HomeDirectoryInfo;
 import com.tyndalehouse.step.core.models.VocabResponse;
 import com.tyndalehouse.step.core.service.ModuleService;
 import com.tyndalehouse.step.core.service.MorphologyService;
@@ -283,5 +284,21 @@ public class ModuleController {
             morphologyInfos.add(new MorphInfo(m, includeAllInfo));
         }
         return morphologyInfos;
+    }
+
+    /**
+     * @return a list of home directory objects
+     */
+    public List<HomeDirectoryInfo> listHomes() {
+        return this.moduleService.listHomes();
+    }
+
+    /**
+     * @return byte[] of file contents
+     */
+    public byte[] getHomeFile(String encodedPath) {
+        String[] pathSegments = encodedPath.split("::");
+        String relativePath = String.join("/", pathSegments);
+        return this.moduleService.getHomeFile(relativePath);
     }
 }

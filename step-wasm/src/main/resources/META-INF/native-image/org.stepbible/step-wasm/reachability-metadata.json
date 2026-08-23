@@ -1,0 +1,467 @@
+{
+  "reflection": [
+    {
+      "type": "com.fasterxml.jackson.databind.ext.Java7SupportImpl",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.ibm.icu.text.DateFormat",
+      "methods": [
+        {
+          "name": "format",
+          "parameterTypes": [
+            "java.util.Date"
+          ]
+        },
+        {
+          "name": "getDateInstance",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.ibm.icu.text.SimpleDateFormat",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.ibm.icu.util.CalendarServiceShim",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.beans.PropertyVetoException"
+    },
+    {
+      "type": "java.lang.Enum",
+      "methods": [
+        {
+          "name": "name",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Object"
+    },
+    {
+      "type": "java.lang.ObjectBeanInfo"
+    },
+    {
+      "type": "java.lang.ObjectCustomizer"
+    },
+    {
+      "type": "java.lang.String"
+    },
+    {
+      "type": "java.lang.Thread",
+      "methods": [
+        {
+          "name": "getContextClassLoader",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.util.Locale",
+      "methods": [
+        {
+          "name": "getDefault",
+          "parameterTypes": [
+            "java.util.Locale$Category"
+          ]
+        },
+        {
+          "name": "getExtensionKeys",
+          "parameterTypes": []
+        },
+        {
+          "name": "getScript",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.util.Locale$Category"
+    },
+    {
+      "type": "org.apache.log4j.Appender"
+    },
+    {
+      "type": "org.apache.log4j.AppenderSkeleton"
+    },
+    {
+      "type": "org.apache.log4j.AppenderSkeletonBeanInfo"
+    },
+    {
+      "type": "org.apache.log4j.AppenderSkeletonCustomizer"
+    },
+    {
+      "type": "org.apache.log4j.Category"
+    },
+    {
+      "type": "org.apache.log4j.CategoryKey"
+    },
+    {
+      "type": "org.apache.log4j.ConsoleAppender",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        },
+        {
+          "name": "setTarget",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "org.apache.log4j.ConsoleAppenderBeanInfo"
+    },
+    {
+      "type": "org.apache.log4j.ConsoleAppenderCustomizer"
+    },
+    {
+      "type": "org.apache.log4j.Layout"
+    },
+    {
+      "type": "org.apache.log4j.LayoutBeanInfo"
+    },
+    {
+      "type": "org.apache.log4j.LayoutCustomizer"
+    },
+    {
+      "type": "org.apache.log4j.Log4jLoggerFactory"
+    },
+    {
+      "type": "org.apache.log4j.Logger"
+    },
+    {
+      "type": "org.apache.log4j.PatternLayout",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        },
+        {
+          "name": "setConversionPattern",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "org.apache.log4j.PatternLayoutBeanInfo"
+    },
+    {
+      "type": "org.apache.log4j.PatternLayoutCustomizer"
+    },
+    {
+      "type": "org.apache.log4j.WriterAppender"
+    },
+    {
+      "type": "org.apache.log4j.WriterAppenderBeanInfo"
+    },
+    {
+      "type": "org.apache.log4j.WriterAppenderCustomizer"
+    },
+    {
+      "type": "org.apache.log4j.helpers.Loader"
+    },
+    {
+      "type": "org.apache.log4j.spi.OptionHandler"
+    },
+    {
+      "type": "org.crosswire.jsword.book.filter.gbf.GBFFilter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.crosswire.jsword.book.filter.osis.OSISFilter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.crosswire.jsword.book.filter.plaintext.PlainTextFilter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.crosswire.jsword.book.filter.thml.THMLFilter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.crosswire.jsword.book.readings.ReadingsBookDriver",
+      "methods": [
+        {
+          "name": "instance",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.crosswire.jsword.book.sword.SwordBookDriver",
+      "methods": [
+        {
+          "name": "instance",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "org.crosswire.jsword.index.lucene.LuceneIndexManager",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.text.resources.cldr.FormatData"
+    },
+    {
+      "type": "sun.text.resources.cldr.FormatData_en"
+    },
+    {
+      "type": "sun.text.resources.cldr.FormatData_en_US"
+    },
+    {
+      "type": "sun.util.resources.cldr.CalendarData"
+    }
+  ],
+  "resources": [
+    {
+      "glob": "/JSMsg_en.properties"
+    },
+    {
+      "glob": "/JSMsg_en_US.properties"
+    },
+    {
+      "glob": "/iso639_en_US.properties"
+    },
+    {
+      "glob": "/org.crosswire.common.util.iso639_en_US.properties"
+    },
+    {
+      "glob": "/org.crosswire.jsword.JSMsg_en.properties"
+    },
+    {
+      "glob": "/org.crosswire.jsword.JSMsg_en_US.properties"
+    },
+    {
+      "glob": "/org.crosswire.jsword.book.BookDriver.plugin"
+    },
+    {
+      "glob": "/org.crosswire.jsword.book.filter.Filter.plugin"
+    },
+    {
+      "glob": "/org.crosswire.jsword.book.readings.ot1nt2_en.properties"
+    },
+    {
+      "glob": "/org.crosswire.jsword.book.readings.ot1nt2_en_US.properties"
+    },
+    {
+      "glob": "/org.crosswire.jsword.book.readings.readings.txt"
+    },
+    {
+      "glob": "/org.crosswire.jsword.index.IndexManager.plugin"
+    },
+    {
+      "glob": "/ot1nt2_en.properties"
+    },
+    {
+      "glob": "/ot1nt2_en_US.properties"
+    },
+    {
+      "glob": "BookDriver.plugin"
+    },
+    {
+      "glob": "Filter.plugin"
+    },
+    {
+      "glob": "IndexManager.plugin"
+    },
+    {
+      "glob": "JSMsg.properties"
+    },
+    {
+      "glob": "JSMsg_en.properties"
+    },
+    {
+      "glob": "JSMsg_en_US.properties"
+    },
+    {
+      "glob": "META-INF/services/java.util.spi.ResourceBundleControlProvider"
+    },
+    {
+      "glob": "com/ibm/icu/ICUConfig.properties"
+    },
+    {
+      "glob": "com/ibm/icu/impl/data/icudt52b"
+    },
+    {
+      "glob": "com/ibm/icu/impl/data/icudt52b/en.res"
+    },
+    {
+      "glob": "com/ibm/icu/impl/data/icudt52b/en_US.res"
+    },
+    {
+      "glob": "com/ibm/icu/impl/data/icudt52b/likelySubtags.res"
+    },
+    {
+      "glob": "com/ibm/icu/impl/data/icudt52b/numberingSystems.res"
+    },
+    {
+      "glob": "com/ibm/icu/impl/data/icudt52b/pool.res"
+    },
+    {
+      "glob": "com/ibm/icu/impl/data/icudt52b/root.res"
+    },
+    {
+      "glob": "com/ibm/icu/impl/data/icudt52b/supplementalData.res"
+    },
+    {
+      "glob": "com/ibm/icu/impl/data/icudt52b/zoneinfo64.res"
+    },
+    {
+      "glob": "com/ibm/icu/impl/urlhandler.props"
+    },
+    {
+      "glob": "iso639.properties"
+    },
+    {
+      "glob": "iso639_en.properties"
+    },
+    {
+      "glob": "iso639_en_US.properties"
+    },
+    {
+      "glob": "log4j.properties"
+    },
+    {
+      "glob": "log4j.xml"
+    },
+    {
+      "glob": "org.crosswire.common.util.iso639_en_US.properties"
+    },
+    {
+      "glob": "org.crosswire.jsword.JSMsg_en.properties"
+    },
+    {
+      "glob": "org.crosswire.jsword.JSMsg_en_US.properties"
+    },
+    {
+      "glob": "org.crosswire.jsword.book.BookDriver.plugin"
+    },
+    {
+      "glob": "org.crosswire.jsword.book.filter.Filter.plugin"
+    },
+    {
+      "glob": "org.crosswire.jsword.book.readings.ot1nt2_en.properties"
+    },
+    {
+      "glob": "org.crosswire.jsword.book.readings.ot1nt2_en_US.properties"
+    },
+    {
+      "glob": "org.crosswire.jsword.book.readings.readings.txt"
+    },
+    {
+      "glob": "org.crosswire.jsword.index.IndexManager.plugin"
+    },
+    {
+      "glob": "org/crosswire/common/util/iso639_en_US.properties"
+    },
+    {
+      "glob": "org/crosswire/common/util/org.crosswire.common.util.iso639_en_US.properties"
+    },
+    {
+      "glob": "org/crosswire/jsword/JSMsg_en.properties"
+    },
+    {
+      "glob": "org/crosswire/jsword/JSMsg_en_US.properties"
+    },
+    {
+      "glob": "org/crosswire/jsword/book/readings/org.crosswire.jsword.book.readings.ot1nt2_en.properties"
+    },
+    {
+      "glob": "org/crosswire/jsword/book/readings/org.crosswire.jsword.book.readings.ot1nt2_en_US.properties"
+    },
+    {
+      "glob": "org/crosswire/jsword/book/readings/ot1nt2_en.properties"
+    },
+    {
+      "glob": "org/crosswire/jsword/book/readings/ot1nt2_en_US.properties"
+    },
+    {
+      "glob": "org/crosswire/jsword/org.crosswire.jsword.JSMsg_en.properties"
+    },
+    {
+      "glob": "org/crosswire/jsword/org.crosswire.jsword.JSMsg_en_US.properties"
+    },
+    {
+      "glob": "org/slf4j/impl/StaticLoggerBinder.class"
+    },
+    {
+      "glob": "ot1nt2.properties"
+    },
+    {
+      "glob": "ot1nt2_en.properties"
+    },
+    {
+      "glob": "ot1nt2_en_US.properties"
+    },
+    {
+      "glob": "readings.txt"
+    },
+    {
+      "glob": "urlhandler.props"
+    },
+    {
+      "bundle": "JSMsg"
+    },
+    {
+      "bundle": "iso639"
+    },
+    {
+      "bundle": "ot1nt2"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "resources": {
+    "includes": [
+      {"pattern": ".*\\.properties$"},
+      {"pattern": ".*\\.vrs$"},
+      {"pattern": ".*\\.xml$"},
+      {"pattern": ".*\\.xsl$"},
+      {"pattern": ".*\\.plugin$"},
+      {"pattern": ".*\\.conf$"},
+      {"pattern": ".*\\.d$"},
+      {"pattern": "org/crosswire/.*"},
+      {"pattern": "res/.*"}
+    ]
+  },
+  "bundles": [
+    {"name": "iso3166"},
+    {"name": "iso639"},
+    {"name": "description"},
+    {"name": "en"},
+    {"name": "ErrorBundle"},
+    {"name": "HtmlBundle"},
+    {"name": "InteractiveBundle"},
+    {"name": "search_results_for"},
+    {"name": "SetupBundle"},
+    {"name": "BibleNames"},
+    {"name": "UserMsg"},
+    {"name": "InternalMsg"}
+  ]
+}

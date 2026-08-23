@@ -1,0 +1,15 @@
+{
+  "resources": [
+    {
+      "module": "java.base",
+      "glob": "sun/launcher/resources/launcher_en.properties"
+    },
+    {
+      "module": "java.base",
+      "glob": "sun/launcher/resources/launcher_en_US.properties"
+    },
+    {
+      "bundle": "sun.launcher.resources.launcher"
+    }
+  ]
+}
