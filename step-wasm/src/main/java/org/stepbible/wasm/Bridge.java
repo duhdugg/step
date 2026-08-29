@@ -121,7 +121,7 @@ public class Bridge {
             Injector injector = new WasmStaticInjector();
 
             System.out.println("entityManager");
-            EntityManagerImpl entityManager = new EntityManagerImpl(true, STEP_HOME + "homes/jsword/step/entities/", injector);
+            EntityManagerImpl entityManager = new EntityManagerImpl(true, STEP_HOME + "/jsword/step/entities/", injector);
 
             System.out.println("morphology");
             MorphologyServiceImpl morphology = new MorphologyServiceImpl(entityManager);
