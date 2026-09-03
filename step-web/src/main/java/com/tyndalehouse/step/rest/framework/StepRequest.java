@@ -79,7 +79,7 @@ public class StepRequest {
         this.methodName = this.requestURI.substring(startOfMethodName,
                 endOfMethodNameSlash == -1 ? this.requestURI.length() : endOfMethodNameSlash);
         String methodNameForSearch = " " + this.methodName + " ";
-        if ((this.controllerName.equals("module")) && (!" getInfo getQuickInfo getAllModules getAllInstallableModules addDirectoryInstaller ".contains(methodNameForSearch)))
+        if ((this.controllerName.equals("module")) && (!" getInfo getQuickInfo getAllModules getAllInstallableModules addDirectoryInstaller listHomes getHomeFile ".contains(methodNameForSearch)))
             throw new StepInternalException("Unable to find a controller for " + requestURI);
         if ((this.controllerName.equals("search")) && (!" suggest masterSearch getSubjectVerses getExactForms ".contains(methodNameForSearch)))
             throw new StepInternalException("Unable to find a controller for " + requestURI);

@@ -126,6 +126,24 @@
 				</plugin>
 
 				<plugin>
+				    <groupId>org.apache.maven.plugins</groupId>
+				    <artifactId>maven-jar-plugin</artifactId>
+				    <version>3.3.0</version>
+				    <executions>
+					<execution>
+					    <id>attach-classes</id>
+					    <phase>package</phase>
+					    <goals>
+						<goal>jar</goal>
+					    </goals>
+					    <configuration>
+						<classifier>classes</classifier>
+					    </configuration>
+					</execution>
+				    </executions>
+				</plugin>
+
+				<plugin>
 					<groupId>nl.geodienstencentrum.maven</groupId>
 					<artifactId>sass-maven-plugin</artifactId>
 					<version>3.5.3</version>
@@ -150,6 +168,14 @@
 				<plugin>
 					<groupId>com.samaxes.maven</groupId>
 					<artifactId>minify-maven-plugin</artifactId>
+					<version>1.7.6</version>
+					<dependencies>
+						<dependency>
+							<groupId>org.codehaus.plexus</groupId>
+							<artifactId>plexus-utils</artifactId>
+							<version>3.5.1</version>
+						</dependency>
+					</dependencies>
 					<executions>
 						<execution>
 							<id>minify-all-step-resources</id>

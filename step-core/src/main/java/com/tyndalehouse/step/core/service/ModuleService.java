@@ -1,6 +1,7 @@
 package com.tyndalehouse.step.core.service;
 
 import com.tyndalehouse.step.core.models.BibleVersion;
+import com.tyndalehouse.step.core.models.HomeDirectoryInfo;
 import org.crosswire.jsword.book.BookCategory;
 
 import java.util.List;
@@ -22,4 +23,13 @@ public interface ModuleService {
      */
     List<BibleVersion> getAllInstallableModules(int installerIndex, BookCategory... categories);
 
+    /**
+     * @return a list of home directories with their paths and modification times
+     */
+    List<HomeDirectoryInfo> listHomes();
+
+    /**
+     * @return byte[] of file contennts
+     */
+    byte[] getHomeFile(String relativePath);
 }
