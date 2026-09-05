@@ -111,7 +111,7 @@ public class Bridge {
         }
     }
 
-    public static void writeBinaryFile(String filePath, String base64Data) throws IOException {
+    public static void writeBinaryFile(String filePath, String base64Data, int mTime) throws IOException {
         File file = new File(filePath);
         File parent = file.getParentFile();
         
@@ -126,7 +126,16 @@ public class Bridge {
 
         try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(data);
+            file.setLastModified(mTime);
         }
+    }
+
+    public static int getFileMtime(String filePath) throws IOException {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            return 0;
+        }
+        return (int) file.lastModified();
     }
 
     public OsisWrapper getText(String version, String reference) {

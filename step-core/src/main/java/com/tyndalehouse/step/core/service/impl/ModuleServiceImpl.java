@@ -106,48 +106,80 @@ public class ModuleServiceImpl implements ModuleService {
         return books.values();
     }
 
+    private Path getHomePath(String key, String defaultPath) {
+        String prop = System.getProperty(key);
+        if (prop == null || prop.trim().isEmpty()) {
+            prop = System.getenv(key.toUpperCase().replace('.', '_'));
+        }
+        if (prop == null || prop.trim().isEmpty()) {
+            prop = defaultPath;
+        }
+        return Paths.get(prop).toAbsolutePath().normalize();
+    }
 
     @Override
     public List<HomeDirectoryInfo> listHomes() {
-        Path rootPath = Paths.get("/opt/step/homes");
+        List<HomeDirectoryInfo> results = new ArrayList<>();
 
-        // Check if directory exists to avoid NoSuchFileException
-        if (!Files.exists(rootPath)) {
-            return new ArrayList<>();
+        Map<String, Path> homePaths = new HashMap<>();
+        homePaths.put("sword", getHomePath("sword.home", "/opt/step/homes/sword"));
+        homePaths.put("jsword", getHomePath("jsword.home", "/opt/step/homes/jsword"));
+
+        for (Map.Entry<String, Path> entry : homePaths.entrySet()) {
+            String prefix = entry.getKey();
+            Path rootPath = entry.getValue();
+
+            if (!Files.exists(rootPath)) {
+                continue;
+            }
+
+            try (Stream<Path> walk = Files.walk(rootPath)) {
+                List<HomeDirectoryInfo> infos = walk
+                        .filter(Files::isRegularFile)
+                        // TODO FIXME filter to offline-licensed modules only
+                        .map(path -> {
+                            Path relative = rootPath.relativize(path);
+                            java.io.File f = path.toFile();
+                            String relativePathStr = prefix + "/" + relative.toString().replace('\\', '/');
+                            return new HomeDirectoryInfo(
+                                    relativePathStr,
+                                    (int) f.lastModified(),
+                                    f.length()
+                            );
+                        })
+                        .collect(Collectors.toList());
+                results.addAll(infos);
+            } catch (IOException e) {
+                LOGGER.error("Failed to traverse home directory: " + rootPath, e);
+            }
         }
 
-        try (Stream<Path> walk = Files.walk(rootPath)) {
-            return walk
-                    // Skip the root directory itself in the results
-                    .filter(path -> !path.equals(rootPath))
-                    .filter(path -> {
-                        String rel = rootPath.relativize(path).toString();
-                        return rel.startsWith("jsword") || rel.startsWith("sword");
-                    })
-                    .filter(Files::isRegularFile)
-                    // TODO FIXME filter to offline-licensed modules only
-                    .map(path -> {
-                        Path relative = rootPath.relativize(path);
-                        java.io.File f = path.toFile();
-                        return new HomeDirectoryInfo(
-                                relative.toString(),
-                            (int) (f.lastModified() / 1000),
-                            f.length()
-                        );
-                    })
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            LOGGER.error("Failed to traverse home directories", e);
-            return new ArrayList<>();
-        }
+        return results;
     }
 
     @Override
     public byte[] getHomeFile(String relativePath) {
-        Path rootPath = Paths.get("/opt/step/homes").toAbsolutePath().normalize();
+        if (relativePath == null || relativePath.isEmpty()) {
+            LOGGER.warn("Relative path was empty");
+            return new byte[0];
+        }
+
+        Path rootPath;
+        String filePathString;
+
+        if (relativePath.startsWith("sword/")) {
+            rootPath = getHomePath("sword.home", "/opt/step/homes/sword");
+            filePathString = relativePath.substring("sword/".length());
+        } else if (relativePath.startsWith("jsword/")) {
+            rootPath = getHomePath("jsword.home", "/opt/step/homes/jsword");
+            filePathString = relativePath.substring("jsword/".length());
+        } else {
+            LOGGER.error("Unauthorized or invalid prefix for relative path: {}", relativePath);
+            throw new StepInternalException("Unauthorized access to file path.");
+        }
 
         // Resolve and normalize the path to prevent ../../ style attacks
-        Path filePath = rootPath.resolve(relativePath).normalize();
+        Path filePath = rootPath.resolve(filePathString).normalize();
 
         // Security Check: Ensure the resolved path is still inside the rootPath
         if (!filePath.startsWith(rootPath)) {

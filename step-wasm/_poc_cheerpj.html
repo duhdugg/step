@@ -2,186 +2,42 @@
 <html>
   <head>
     <title>POC - Cheerpj</title>
-    <script src="https://cjrtnc.leaningtech.com/4.3/loader.js"></script>
     <script>
-      const memoryCache = new Map();
-
-      async function listHomes() {
-        const response = await fetch("/rest/module/listHomes");
-        const data = await response.json();
-        return data;
-      }
-
-      function encodePath(path) {
-        const reslash = new RegExp("\/", "g");
-        const encodedPath = path.replace(reslash, "::");
-        return encodedPath;
-      }
-
-      async function getFileHandleFromPath(path, create = false) {
-        const segments = path.split("/");
-        let currentHandle = await navigator.storage.getDirectory();
-        for (let i = 0; i < segments.length - 1; i++) {
-          currentHandle = await currentHandle.getDirectoryHandle(segments[i], {
-            create,
-          });
-        }
-        const fileName = segments[segments.length - 1];
-        return await currentHandle.getFileHandle(fileName, { create });
-      }
-
-      async function getData(path) {
-        const encodedPath = encodePath(path);
-        const response = await fetch(`/rest/module/getHomeFile/${encodedPath}`);
-        const data = await response.json();
-        return data;
-      }
-
-      async function saveData(path, data) {
-        const handle = await getFileHandleFromPath(path, true);
-        const stream = await handle.createWritable();
-        await stream.write(data);
-        await stream.close();
-      }
-
-      async function getOfflineData(path) {
-        const handle = await getFileHandleFromPath(path, false);
-        const file = await handle.getFile();
-        return file.text();
-      }
-
-      async function listOPFS(directoryHandle, path = "") {
-        const files = [];
-        // Default to the root if no handle is provided
-        if (!directoryHandle) {
-          directoryHandle = await navigator.storage.getDirectory();
-        }
-        for await (const [name, handle] of directoryHandle.entries()) {
-          const relativePath = path ? `${path}/${name}` : name;
-
-          if (handle.kind === "directory") {
-            // Recurse into subdirectories
-            const subFiles = await listOPFS(handle, relativePath);
-            files.push(...subFiles);
-          } else {
-            // It's a file
-            const file = await handle.getFile();
-            files.push({
-              path: relativePath,
-              size: file.size,
-              lastModified: Math.floor(file.lastModified / 1000), // Consistent with Java API
-            });
-          }
-        }
-        return files;
-      }
-
-      async function deleteOPFSFile(path) {
-        // Split and clean the path
-        const segments = path.split("/").filter(Boolean);
-        if (segments.length === 0) return;
-
-        const fileName = segments.pop(); // The last part is the file
-        let currentHandle = await navigator.storage.getDirectory();
-
-        try {
-          // Navigate to the parent directory
-          for (const segment of segments) {
-            currentHandle = await currentHandle.getDirectoryHandle(segment);
-          }
-
-          // Remove the file entry
-          await currentHandle.removeEntry(fileName);
-          console.log(`Deleted: ${path}`);
-        } catch (e) {
-          if (e.name === "NotFoundError") {
-            console.warn(`File not found, nothing to delete: ${path}`);
-          } else {
-            throw e;
-          }
-        }
-      }
-
-      async function warmCache() {
-        const files = await listOPFS();
-        for (const f of files) {
-          const data = await getOfflineData(f.path);
-          memoryCache.set(f.path, data);
-        }
-        globalThis.memoryCache = memoryCache;
-        console.debug("loaded to memoryCache");
-      }
-
-      async function initializeVfsAndBridge() {
-        globalThis.Bridge = await lib.org.stepbible.wasm.Bridge;
-
-        // 1. Fetch file list from the backend
-        const response = await fetch('/rest/module/listHomes');
-        const files = await response.json(); // Array of HomeDirectoryInfo objects
-
-        // 2. Iterate through files and fetch their raw bytes via getHomeFile
-        for (const [path, data] of globalThis.memoryCache.entries()) {
-          console.debug({ seedFile: path });
-          const targetVfsPath = `/files/step/homes/${path}`;
-          await Bridge.writeBinaryFile(targetVfsPath, data);
-          console.debug({ done: path });
-        }
-
-        // 4. Instantiate Bridge now that the VFS directory tree is fully populated
-        globalThis.bridge = await Bridge();
-        return bridge;
-      }
-
-      globalThis.getFromOPFS = (fileName) => {
-        console.debug({ getFromOPFS: fileName });
-        console.log("Java called globalThis.getFromOPFS for:", fileName);
-        const data = memoryCache.get(fileName);
-        if (!data) {
-          throw "FILE_NOT_FOUND";
-        }
-        return data;
-      };
-
       (async () => {
-        const homeFiles = await listHomes();
-        for (const homeFile of homeFiles) {
-          const path = homeFile.path;
-          if (!path.includes("ESV_th") && !path.includes("entities")) {
-            continue;
-          }
-          const data = await getData(path);
-          await saveData(path, data);
-          console.debug(path);
-        }
-        await warmCache();
-        console.debug("running Cheerpj");
-        await cheerpjInit();
-        console.debug("Cheerpj Loaded.");
-        globalThis.jarUrl = new URL("/html/step-wasm.jar", window.location.origin).href;
-        console.debug(jarUrl);
-        globalThis.jarRes = await fetch(jarUrl);
-        globalThis.jarBuffer = await jarRes.arrayBuffer();
-        cheerpOSAddStringFile("/str/step-wasm.jar", new Uint8Array(jarBuffer));
-        globalThis.lib = await cheerpjRunLibrary('/str/step-wasm.jar');
-        globalThis.System = await lib.java.lang.System;
-        globalThis.bridge = await initializeVfsAndBridge();
-        try {
-          globalThis.text = await bridge.getText('ESV_th', 'GEN 1.1');
-          console.log(await text.getValue());
-        } catch (e) {
-          console.log(e.printStackTrace())
-        }
+        const worker = new SharedWorker("./wasm-worker.js", {
+          name: "STEP WASM Worker",
+        });
+        globalThis.worker = worker;
+        worker.port.start();
+        let end = null;
+        const workerMessageRouter = {
+          ready: (e) => {
+            worker.port.postMessage({
+              action: "getTextWithOptions",
+              args: ["ESV", "Jhn 1", "HVUG", ""],
+            });
+          },
+          "return:getTextWithOptions": (e) => {
+            const app = document.getElementById("app");
+            app.innerHTML = e.data.value;
+          },
+          default: (e) => {
+            console.warn("unhandled action", e.data);
+          },
+        };
+        worker.port.onmessage = (e) => {
+          console.debug("wasm-worker message", e);
+          (workerMessageRouter[e.data?.action] || workerMessageRouter.default)(
+            e,
+          );
+        };
+        worker.port.onerror = (e) => {
+          console.error("wasm-worker error", e);
+        };
       })();
     </script>
-    <style>
-      #response {
-        white-space: pre-wrap;
-        font-family: monospace;
-      }
-    </style>
   </head>
   <body>
     <div id="app"></div>
   </body>
 </html>
-
