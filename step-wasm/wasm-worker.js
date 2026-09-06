@@ -149,27 +149,30 @@ self.onconnect = async (event) => {
 
   if (!isInitialized && !isLoading) {
     isLoading = true;
-    broadcast({ action: "loading" });
+    broadcast({ value: "worker:loading" });
     await cheerpjInit();
-    const jarUrl = "/html/step-wasm.jar";
+    const jarUrl = "/js/step-wasm.jar";
     const jarRes = await fetch(jarUrl);
     const jarBuffer = await jarRes.arrayBuffer();
     cheerpOSAddStringFile("/str/step-wasm.jar", new Uint8Array(jarBuffer));
     lib = await cheerpjRunLibrary("/str/step-wasm.jar");
     bridge = await initializeVfsAndBridge();
     isInitialized = true;
-    broadcast({ action: "ready" });
+    broadcast({ value: "worker:ready" });
   } else if (isInitialized) {
-    port.postMessage({ action: "ready" });
+    port.postMessage({ value: "worker:ready" });
   }
 
   const messageRouter = {
-    getTextWithOptions: async (e) => {
-      const { args } = e.data;
+    masterSearch: async (e) => {
+      const { id, args } = e.data;
       try {
-        const text = await bridge.getTextWithOptions(...args);
-        const value = await text.getValue();
-        port.postMessage({ action: "return:getTextWithOptions", value });
+        const searchController = await bridge.searchController;
+        const response = await searchController.masterSearch(...args);
+        ObjectMapper = await lib.com.fasterxml.jackson.databind.ObjectMapper;
+        const mapper = await new ObjectMapper();
+        const value = JSON.parse(await mapper.writeValueAsString(response));
+        port.postMessage({ id, value });
       } catch (e) {
         console.error(e)
         if (e.printStackTrace) {

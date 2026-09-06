@@ -10,6 +10,7 @@ import com.tyndalehouse.step.core.models.ClientSession;
 import com.tyndalehouse.step.core.models.OsisWrapper;
 import com.tyndalehouse.step.core.guice.StepCoreModule;
 import com.tyndalehouse.step.rest.controllers.BibleController;
+import com.tyndalehouse.step.rest.controllers.SearchController;
 
 import javax.inject.Provider;
 import java.io.IOException;
@@ -31,8 +32,9 @@ import java.io.IOException;
 import java.util.Base64;
 
 public class Bridge {
-    private Injector injector;
-    private BibleController bibleController;
+    public Injector injector;
+    public BibleController bibleController;
+    public SearchController searchController;
     private static final String STEP_HOME = "/files/step/homes";
 
     static {
@@ -87,6 +89,7 @@ public class Bridge {
 
             System.err.println("Retrieving BibleController instance...");
             this.bibleController = this.injector.getInstance(BibleController.class);
+            this.searchController = this.injector.getInstance(SearchController.class);
 
             System.err.println("=== STEP-WASM BRIDGE INITIALIZED SUCCESSFULLY ===");
 
@@ -136,21 +139,5 @@ public class Bridge {
             return 0;
         }
         return (int) file.lastModified();
-    }
-
-    public OsisWrapper getText(String version, String reference) {
-        return this.bibleController.getBibleText(version, reference);
-    }
-
-    public OsisWrapper getTextWithOptions(String version, String reference, String options, String interlinear) {
-        return this.bibleController.getBibleText(version, reference, options, interlinear);
-    }
-
-    public BibleController getController() {
-        return this.bibleController;
-    }
-
-    public Injector getInjector() {
-        return this.injector;
     }
 }

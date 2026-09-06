@@ -2,39 +2,23 @@
 <html>
   <head>
     <title>POC - Cheerpj</title>
-    <script>
-      (async () => {
-        const worker = new SharedWorker("./wasm-worker.js", {
+    <script type='module'>
+      console.debug('loading');
+      import { createWorkerClient } from "/js/worker_client.js";
+      const wasmWorker = new SharedWorker("/js/wasm-worker.js", {
           name: "STEP WASM Worker",
-        });
-        globalThis.worker = worker;
-        worker.port.start();
-        let end = null;
-        const workerMessageRouter = {
-          ready: (e) => {
-            worker.port.postMessage({
-              action: "getTextWithOptions",
-              args: ["ESV", "Jhn 1", "HVUG", ""],
-            });
-          },
-          "return:getTextWithOptions": (e) => {
-            const app = document.getElementById("app");
-            app.innerHTML = e.data.value;
-          },
-          default: (e) => {
-            console.warn("unhandled action", e.data);
-          },
-        };
-        worker.port.onmessage = (e) => {
-          console.debug("wasm-worker message", e);
-          (workerMessageRouter[e.data?.action] || workerMessageRouter.default)(
-            e,
-          );
-        };
-        worker.port.onerror = (e) => {
-          console.error("wasm-worker error", e);
-        };
-      })();
+      });
+      let wasmWorkerClient = {};
+      wasmWorkerClient = createWorkerClient(wasmWorker.port, async () => {
+          console.log("WASM worker ready");
+          const response = await wasmWorkerClient('masterSearch', ['version=ESV@reference=Job.28', 'V']);
+          console.debug({ response });
+          const app = document.getElementById('app');
+          app.innerHTML = response.value;
+      });
+      globalThis.wasmWorker = wasmWorker;
+      globalThis.wasmWorkerClient = wasmWorkerClient;
+      wasmWorker.port.start();
     </script>
   </head>
   <body>
