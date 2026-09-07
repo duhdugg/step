@@ -807,10 +807,10 @@ userCountry = (userCountry == null) ? "UNKNOWN" : userCountry.toUpperCase();
     let wasmWorkerClient = {}
     wasmWorkerClient = createWorkerClient(wasmWorker.port, () => {
         console.log("WASM worker ready");
+        globalThis.stepOffline = true;
     });
     globalThis.wasmWorker = wasmWorker;
     globalThis.wasmWorkerClient = wasmWorkerClient;
-    globalThis.stepOffline = true;
     wasmWorker.port.start();
 </script>
 </body>

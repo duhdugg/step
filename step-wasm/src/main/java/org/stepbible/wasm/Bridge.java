@@ -11,6 +11,7 @@ import com.tyndalehouse.step.core.models.OsisWrapper;
 import com.tyndalehouse.step.core.guice.StepCoreModule;
 import com.tyndalehouse.step.rest.controllers.BibleController;
 import com.tyndalehouse.step.rest.controllers.SearchController;
+import com.tyndalehouse.step.rest.controllers.ModuleController;
 
 import javax.inject.Provider;
 import java.io.IOException;
@@ -35,6 +36,7 @@ public class Bridge {
     public Injector injector;
     public BibleController bibleController;
     public SearchController searchController;
+    public ModuleController moduleController;
     private static final String STEP_HOME = "/files/step/homes";
 
     static {
@@ -90,6 +92,7 @@ public class Bridge {
             System.err.println("Retrieving BibleController instance...");
             this.bibleController = this.injector.getInstance(BibleController.class);
             this.searchController = this.injector.getInstance(SearchController.class);
+            this.moduleController = this.injector.getInstance(ModuleController.class);
 
             System.err.println("=== STEP-WASM BRIDGE INITIALIZED SUCCESSFULLY ===");
 
@@ -97,7 +100,7 @@ public class Bridge {
             System.err.println("!!! STEP-WASM BRIDGE INITIALIZATION FAILED !!!");
             System.err.println("Exception Type: " + t.getClass().getName());
             System.err.println("Message: " + t.getMessage());
-            
+
             t.printStackTrace(System.err);
 
             StringWriter sw = new StringWriter();
@@ -117,7 +120,7 @@ public class Bridge {
     public static void writeBinaryFile(String filePath, String base64Data, int mTime) throws IOException {
         File file = new File(filePath);
         File parent = file.getParentFile();
-        
+
         if (parent != null && !parent.exists()) {
             boolean created = parent.mkdirs();
             if (!created && !parent.exists()) {

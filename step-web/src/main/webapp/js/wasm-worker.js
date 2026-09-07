@@ -120,7 +120,7 @@ async function initializeVfsAndBridge() {
     const path = homeFile.path;
     const targetVfsPath = `/files/step/homes/${path}`;
     console.debug({ targetVfsPath: path });
-    if (homeFile.mtime > await Bridge.getFileMtime(targetVfsPath)) {
+    if (homeFile.mtime > (await Bridge.getFileMtime(targetVfsPath))) {
       const data = await getData(path);
       console.debug({ writing: path });
       await Bridge.writeBinaryFile(targetVfsPath, data, homeFile.lastModified);
@@ -163,27 +163,31 @@ self.onconnect = async (event) => {
     port.postMessage({ value: "worker:ready" });
   }
 
-  const messageRouter = {
-    masterSearch: async (e) => {
-      const { id, args } = e.data;
-      try {
-        const searchController = await bridge.searchController;
-        const response = await searchController.masterSearch(...args);
-        ObjectMapper = await lib.com.fasterxml.jackson.databind.ObjectMapper;
-        const mapper = await new ObjectMapper();
-        const value = JSON.parse(await mapper.writeValueAsString(response));
-        port.postMessage({ id, value });
-      } catch (e) {
-        console.error(e)
-        if (e.printStackTrace) {
-          await e.printStackTrace();
-        }
-        throw e;
+  const handleRequest = async (e, controllerName, methodName) => {
+    const { id, args } = e.data;
+    try {
+      const controller = await bridge[controllerName];
+      const response = await controller[methodName](...args);
+      const ObjectMapper =
+        await lib.com.fasterxml.jackson.databind.ObjectMapper;
+      const mapper = await new ObjectMapper();
+      const value = JSON.parse(await mapper.writeValueAsString(response));
+      port.postMessage({ id, value });
+    } catch (err) {
+      console.error(err);
+      if (err.printStackTrace) {
+        await err.printStackTrace();
       }
-    },
+      throw err;
+    }
+  };
+
+  const messageRouter = {
+    getQuickInfo: (e) => handleRequest(e, "moduleController", "getQuickInfo"),
+    masterSearch: (e) => handleRequest(e, "searchController", "masterSearch"),
     default: (e) => {
-      console.warn('unhandled action', e);
-      port.postMessage({ id: e.data.id, error: 'unhandled action' });
+      console.warn("unhandled action", e);
+      port.postMessage({ id: e.data.id, error: "unhandled action" });
     },
   };
   port.onmessage = async function (e) {

@@ -4,8 +4,15 @@
   const originalGet = $.get;
 
   $.get = function (url, data, callback, type) {
+    const splitUrl = url.split('/');
+    let offlineRequest = globalThis.stepOffline;
+
+    console.log({ url });
+    if (splitUrl.slice(0, 3).join('/') === '/html/lexicon') {
+      offlineRequest = false;
+    }
     // 1. If not offline, fall back directly to original $.get
-    if (!globalThis.stepOffline) {
+    if (!offlineRequest) {
       return originalGet.apply(this, arguments);
     }
 
@@ -28,17 +35,22 @@
       deferred.done(callback);
     }
 
-    // 4. Dispatch request to the worker client
+    // intercept urls and convert the action + args for wasm worker client
     let action = url
     let args = { url, data, type };
-    const splitUrl = url.split('/');
     if (splitUrl.slice(0, 3).join('/') === 'rest/search/masterSearch') {
       action = 'masterSearch';
       args = splitUrl.slice(splitUrl.indexOf('masterSearch')+1).map(decodeURIComponent);
+    } else if (splitUrl.slice(0, 3).join('/') === 'rest/module/getQuickInfo') {
+      action = 'getQuickInfo';
+      args = splitUrl.slice(splitUrl.indexOf('getQuickInfo')+1).map(decodeURIComponent);
+      args[args.length-1] = args[args.length-1].split('?')[0];
     }
+    //
+    // 4. Dispatch request to the worker client
     globalThis.wasmWorkerClient(action, args)
       .then((response) => {
-        console.log(response, 'response');
+        console.log('response', response);
         // Handle worker-level success vs error payloads
         if (response && response.error) {
           deferred.reject(response.error);
