@@ -789,6 +789,7 @@ var PassageDisplayView = DisplayView.extend({
                                         }
                                     }
                                 }
+                                // FIXME WASM
                                 $.getSafe(BIBLE_GET_BIBLE_TEXT + chosenVersion + "/" + encodeURIComponent(xref), function (data) {
                                     var text2Display = data.value;
                                     if (data.value.length > 1100)

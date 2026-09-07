@@ -18,3 +18,4 @@ bin
 *-SNAPSHOT*.min.js
 .sass-cache/
 .DS_Store
+step-web/src/main/webapp/js/step-wasm.jar

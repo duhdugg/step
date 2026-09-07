@@ -43,6 +43,7 @@
 				url = url.replace(/\|/g, "@");
 			if (url.indexOf("@@") > -1)
 				url = url.replace(/@@/g, "@");
+            console.warn("getSafe", url + langParam);
             return $.get(url + langParam, function (data, textStatus, jqXHR) {
                 if (step.state.responseLanguage == undefined) {
                     //set the language

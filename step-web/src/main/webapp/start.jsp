@@ -798,5 +798,20 @@ userCountry = (userCountry == null) ? "UNKNOWN" : userCountry.toUpperCase();
 
     initDyslexia11y();
 </script>
+<script src="/js/jquery-offline-override.js"></script>
+<script type="module">
+    import { createWorkerClient } from "./js/worker_client.js";
+    const wasmWorker = new SharedWorker("/js/wasm-worker.js", {
+        name: "STEP WASM Worker",
+    });
+    let wasmWorkerClient = {}
+    wasmWorkerClient = createWorkerClient(wasmWorker.port, () => {
+        console.log("WASM worker ready");
+    });
+    globalThis.wasmWorker = wasmWorker;
+    globalThis.wasmWorkerClient = wasmWorkerClient;
+    globalThis.stepOffline = true;
+    wasmWorker.port.start();
+</script>
 </body>
 </html>

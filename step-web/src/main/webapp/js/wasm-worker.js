@@ -178,10 +178,12 @@ self.onconnect = async (event) => {
         if (e.printStackTrace) {
           await e.printStackTrace();
         }
+        throw e;
       }
     },
     default: (e) => {
       console.warn('unhandled action', e);
+      port.postMessage({ id: e.data.id, error: 'unhandled action' });
     },
   };
   port.onmessage = async function (e) {
