@@ -143,7 +143,7 @@ public class ModuleServiceImpl implements ModuleService {
                             String relativePathStr = prefix + "/" + relative.toString().replace('\\', '/');
                             return new HomeDirectoryInfo(
                                     relativePathStr,
-                                    (int) f.lastModified(),
+                                    (long) f.lastModified(),
                                     f.length()
                             );
                         })
