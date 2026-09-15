@@ -132,7 +132,7 @@ step.util = {
     outstandingRequests: 0,
     timersForSTEPApp: {},
 	versionsBoth: ["ESV", "KJV", "NASB2020", "BSB", "HCSB", "RV_TH", "WEB_TH", "ASV-TH", "CHIUN", "CHIUNS", "NASB1995", "RWEBSTER", "SPABES2018EB", "ARASVD"],
-	versionsGreekNT: ["SBLG_TH", "THGNT", "TR", "BYZ", "WHNU", "ELZEVIR", "ANTONIADES", "KHMKCB"],
+	versionsGreekNT: ["SBLG_TH", "THGNT", "TR", "BYZ", "WHNU", "ELZEVIR", "ANTONIADES", "KHMKCB", "NIV"],
 	versionsGreekOT: ["LXX_TH"],
 	versionsGreekBoth: ["ABEN", "ABGK"],
 	versionsHebrewOT: ["THOT", "OSHB", "SP", "SPMT"],
@@ -260,7 +260,7 @@ step.util = {
 			}
 			if (bibleVersions.indexOf(bibleName) > -1) // Bibles selected by the users
 				msg[0] += newMsg;
-			else if ("ESV,NASB2020,SBLG_TH,LXX_TH,THOT".indexOf(bibleName) > -1) // Popular Bibles with good Strong tagging
+			else if ("ESV,NIV,NASB2020,SBLG_TH,LXX_TH,THOT".indexOf(bibleName) > -1) // Popular Bibles with good Strong tagging
 				msg[1] += newMsg;
 			else
 				msg[2] += newMsg;
@@ -1101,25 +1101,23 @@ step.util = {
         return term.replace(/"/g, '\\\"');
     },
     swapMasterVersion: function (newMasterVersion, passageModel, silent) {
-        var replacePattern = new RegExp("version=" + newMasterVersion, "ig");
-        // check .get() to see if it can be used to replase | with @
-        var originalArgs = passageModel.get("args");
-        var newArgs = originalArgs.replace(replacePattern, "");
-        newArgs = "version=" + newMasterVersion + URL_SEPARATOR + newArgs;
-        newArgs = newArgs.replace(/@@/g, URL_SEPARATOR).replace(/@$/, "").replace(/\|\|/g, URL_SEPARATOR).replace(/\|$/, "");
-
-        //now get the versions in the right order and overwrite the stored master version and extraVersions
-        var versions = (newArgs || "").match(/version=[a-zA-Z0-9]+/ig) || [];
-        var allVersions = [];
-        for (var i = 0; i < versions.length; i++) {
-            var versionName = versions[i].substring("version=".length);
-            allVersions.push(versionName);
+        var originalArgs = passageModel.get("args").split("@");
+		var foundNewMasterVersion = false;
+        var otherVersions = [];
+		var newArgs = "version=" + newMasterVersion;
+		for (var i = 0; i < originalArgs.length; i++) {
+			if (originalArgs[i].substring(0,8) === "version=") {
+				var versionName = originalArgs[i].substring(8);
+				if (versionName === newMasterVersion) {
+					foundNewMasterVersion = true;
+					continue;
+				}
+				otherVersions.push(versionName);
+			}
+			newArgs += "@" + originalArgs[i];
         }
-
-        var masterVersion = allVersions[0];
-        var otherVersions = allVersions.slice(1);
-		if (!step.util.checkFirstBibleHasPassageBeforeSwap(newMasterVersion, passageModel, otherVersions)) return;
-        passageModel.save({ args: newArgs, masterVersion: masterVersion, otherVersions: otherVersions }, { silent: silent });
+		if ((!foundNewMasterVersion) || (otherVersions.length < 1) || (!step.util.checkFirstBibleHasPassageBeforeSwap(newMasterVersion, passageModel, otherVersions))) return;
+        passageModel.save({ args: newArgs, masterVersion: newMasterVersion, otherVersions: otherVersions }, { silent: silent });
 		step.util.incrementLocalStorage("step.interlinearTutorial");
     },
     ui: {
@@ -1396,6 +1394,9 @@ step.util = {
                 case RELATED_VERSES:
                     source = __s.verse_related;
                     break;
+                case RELATED_VERSES_SEMANTIC:
+                    source = "Related verses (meaning)";
+                    break;
                 case TOPIC_BY_REF:
                     source = __s.related_by_topic;
                     break;
@@ -1476,6 +1477,13 @@ step.util = {
                         entry.item.text + '</div>';
                 case RELATED_VERSES:
                     return '<div class="relatedVersesItem" ' +
+                        'title="' + source + util.safeEscapeQuote(entry.item.text) + '" ' +
+                        'data-item-type="' + entry.itemType + '" ' +
+                        'data-select-id="' + util.safeEscapeQuote(entry.item.text) + '" ' +
+                        '>' + __s.related_prefix + " " +
+                        entry.item.text + '</div>';
+                case RELATED_VERSES_SEMANTIC:
+                    return '<div class="relatedVersesSemanticItem" ' +
                         'title="' + source + util.safeEscapeQuote(entry.item.text) + '" ' +
                         'data-item-type="' + entry.itemType + '" ' +
                         'data-select-id="' + util.safeEscapeQuote(entry.item.text) + '" ' +
@@ -2044,7 +2052,13 @@ step.util = {
 							var delay = step.passages.findWhere({ passageId: passageId }).get("interlinearMode") === 'INTERLINEAR' ? 650 : 50;
 							step.util.delay(function () {
 									$.getSafe(BIBLE_GET_STRONGS_AND_SUBJECTS, [version, reference, step.userLanguageCode], function (data) {
-											var template = '<div class="vocabTable">' +
+											var template = '<div class="relatedVersesChooser">' +
+														'Display verses related by ' +
+														'<a onclick="javascript:void(0)" class="relatedVersesSemantic">meaning</a> | ' +
+														'<a onclick="javascript:void(0)" class="relatedVerses">vocabulary</a> | ' +
+														'<a onclick="javascript:void(0)" class="relatedSubjects">topics</a>' +
+														'</div>' +
+														'<div class="vocabTable">' +
 													'<div class="col-xs-8 col-sm-4 heading"><h1><%= (data.multipleVerses ? sprintf(__s.vocab_for_verse, data.verse) : "") %></h1></div>' +
 													'<div class="col-xs-2 col-sm-1 heading"><h1><%= __s.bible_book %></h1></div>' +
 													'<div class="col-xs-2 col-sm-1 heading"><h1><%= ot ? __s.OT : __s.NT %></h1></div>' +
@@ -2075,8 +2089,7 @@ step.util = {
 														'<span class="even"></span>' +
 													'<% } %>' +
 													'</div>' +
-													'<div class="verseVocabLinks"><a onclick="javascript:void(0)" class="relatedVerses"><%= __s.see_related_verses %></a> ' +
-													'<a onclick="javascript:void(0)" class="relatedSubjects"><%= __s.see_related_subjects%></a> ' +
+													'<div class="verseVocabLinks">' +
 													'<a onclick="javascript:void(0)" class="seeTips">See Translation TIPS</a> ' +
 													'<% if(isSearch) { %><a onclick="javascript:void(0)" class="verseInContext"><%= __s.see_verse_in_context %></a><% } %></div>';
 											var rows = [];
@@ -2233,6 +2246,12 @@ step.util = {
 												step.router.navigatePreserveVersions(RELATED_VERSES + "=" + encodeURIComponent(key), null, null, null, true);
 											});
 
+											templatedTable.find(".relatedVersesSemantic").click(function () {
+												if (!step.touchDevice || step.touchWideDevice)
+													step.util.createNewLinkedColumn(passageId);
+												step.router.navigatePreserveVersions(RELATED_VERSES_SEMANTIC + "=" + encodeURIComponent(key), null, null, null, true);
+											});
+
 											templatedTable.find(".relatedSubjects").click(function () {
 												if (!step.touchDevice || step.touchWideDevice)
 													step.util.createNewLinkedColumn(passageId);
@@ -2249,6 +2268,10 @@ step.util = {
 											}
 											else
 												templatedTable.find(".seeTips").remove(); // No translation tips
+
+											if (templatedTable.filter(".verseVocabLinks").find("a").length === 0) {
+												templatedTable = templatedTable.not(".verseVocabLinks");
+											}
 
 											templatedTable.find(".verseInContext").click(function () {
 													element.trigger("click");
@@ -3433,18 +3456,19 @@ step.util = {
             )()).modal("show");
 			step.util.blockBackgroundScrolling('showBookOrChapterSummaryModal');
 			step.util.buildBibleProjectVideo(step.userLanguageCode);
-		    var introCountFromStorageOrCookie = step.util.localStorageGetItem("step.showBibleProject");
+			if (document.querySelector('.introjs-overlay') != null) return;
+		    var introCountFromStorageOrCookie = step.util.localStorageGetItem("step.showBibleProject"); 
 			var introCount = parseInt(introCountFromStorageOrCookie, 10);
 			if (isNaN(introCount)) introCount = 0;
 			if (introCount < 1) {
 				var pos = (window.innerWidth > 499) ? "bottom" : "left";
 				var introJsSteps = [
-				{
-					element: document.querySelector('#bibleTab'),
-					intro: "Click on the \"Bible summary\" tab to see summary videos by the BibleProject!",
-					position: pos
-				}
-         	   ];
+					{
+						element: document.querySelector('#bibleTab'),
+						intro: "Click on the \"Bible summary\" tab to see summary videos by the BibleProject!",
+						position: pos
+					}
+				];
 				introJs().setOptions({
 					steps: introJsSteps
 				}).start();
@@ -4137,7 +4161,7 @@ step.util = {
 		}
 	},
 	showIntroJS: function(element, introMsg, position, width, localStorageName, skipTouchScreen, showNumOfTimes, sleepTime) {
-		if ((skipTouchScreen && step.touchDevice) || (window.innerWidth < width))
+		if ((skipTouchScreen && step.touchDevice) || (window.innerWidth < width) || (document.querySelector('.introjs-overlay') != null))
 			return false;
 	    var introCountFromStorageOrCookie = step.util.localStorageGetItem(localStorageName);
 		var introCount = parseInt(introCountFromStorageOrCookie, 10);
@@ -4181,8 +4205,9 @@ step.util = {
 		}
 	},
 	showIntro: function (showAnyway) {
-		if ((!showAnyway) && (($.getUrlVars().indexOf("skipwelcome") > -1) || (step.state.isLocal()))) return;
-		if (step.appleTouchDevice) // Only for Android.  On iPad, introJS will cause the bible, reference and search buttons to be gone
+		if (!showAnyway && (($.getUrlVars().indexOf("skipwelcome") > -1) || step.state.isLocal())) return;
+		if (step.appleTouchDevice || // Only for Android.  On iPad, introJS will cause the bible, reference and search buttons to be gone
+			(document.querySelector('.introjs-overlay') != null)) 
 			return;
 	    var introCountFromStorageOrCookie = step.util.localStorageGetItem("step.usageCount");
 		var introCount = parseInt(introCountFromStorageOrCookie, 10);
@@ -4213,30 +4238,44 @@ step.util = {
 				steps: introJsSteps, nextLabel: " > ", prevLabel: " < ", doneLabel: __s.done
 			}).start();
 		}
-		else {
-			if (!step.util.showIntroJS(document.querySelector('.select-version.stepButtonTriangle'),
-				'New Bible Edition!<br>The NIV now has two versions: "USA" and "Anglicised".',
-			 	'bottom', 0, 'step.nivusa'))
-				if (!step.util.showIntroJS(document.querySelector('#report-icon'),
-					'New Features!<br><ul style="padding-left:15px"><li>Chronology: An interactive timeline of people, places and events.<li>People in the Bible: An interactive chart of the family trees of biblecal figures.</ul>.',
-				 	'bottom', 0, 'step.genchron', true))
-					if (!step.util.showIntroJS(document.querySelector('#colorgrammar-icon'),
-						'Color code grammar is available with a new user interface.',
-						'left', 499, 'step.colorgrammar'))
-						if (!step.util.showIntroJS(document.querySelector('#copy-icon'),
-							__s.copy_intro, 'left', 499, 'step.copyIntro'))
-								step.util.showIntroJS(document.querySelector('#summbutton'),
-									"For commentaries from ICC and The Gospel Coalition, click on Summary and then Commentaries",
-									'bottom', 499, 'step.commentaryIntro');
-		}
+		else if (!step.util.showIntroJS(document.querySelector('#report-icon'),
+				'New Features!<br><ul style="padding-left:15px"><li>Chronology: An interactive timeline of people, places and events.<li>People in the Bible: An interactive chart of the family trees of biblecal figures.</ul>.',
+				'bottom', 0, 'step.genchron', true))
+			if (!step.util.showIntroJS(document.querySelector('#colorgrammar-icon'),
+					'Color code grammar is available with a new user interface.',
+					'left', 499, 'step.colorgrammar'))
+				if (!step.util.showIntroJS(document.querySelector('#copy-icon'),
+					__s.copy_intro, 'left', 499, 'step.copyIntro'))
+						step.util.showIntroJS(document.querySelector('#summbutton'),
+							"For commentaries from ICC and The Gospel Coalition, click on Summary and then Commentaries",
+							'bottom', 499, 'step.commentaryIntro');
 	},
     showIntroOfMultiVersion: function () {
-		if ($.getUrlVars().indexOf("skipwelcome") > -1) return;
-		if (step.appleTouchDevice) // Only for Android.  On iPad, introJS will cause the bible, reference and search buttons to be gone
+		if (($.getUrlVars().indexOf("skipwelcome") > -1) ||
+			(step.appleTouchDevice)) // Only for Android.  On iPad, introJS will cause the bible, reference and search buttons to be gone
 			return;
 		step.util.showIntroJS(document.querySelector('.passageContainer.active').querySelector('.dropdown.settingsDropdown'),
 			__s.introjs_multi_version,
 			'left', 499, 'step.multiVersionCount');
+	},
+	showIntroOfTaggedNIVNT: function () {
+		if (($.getUrlVars().indexOf("skipwelcome") > -1) || (document.querySelector('.introjs-overlay') != null) ||
+			(step.appleTouchDevice)) // Only for Android.  On iPad, introJS will cause the bible, reference and search buttons to be gone
+				return;
+		var introCountFromStorageOrCookie = step.util.localStorageGetItem("step.taggedNIV");
+		var introCount = parseInt(introCountFromStorageOrCookie, 10);
+		if (isNaN(introCount)) introCount = 0;
+		if (introCount < 1) {
+			var introJsSteps = [
+				{
+					intro: __s.introjs_taggedNIV
+				}
+			];
+			step.util.localStorageSetItem("step.taggedNIV", 1);
+			introJs().setOptions({
+				steps: introJsSteps
+			}).start();
+		}
 	},
 	closeModal: function (modalID) {
 		var modalsRequireUnfreezeOfScroll = " showLongAlertModal showBookOrChapterSummaryModal grammarClrModal passageSelectionModal searchSelectionModal copyModal videoModal fontSettings raiseSupport aboutModal bibleVersions ";
@@ -5199,7 +5238,8 @@ step.util = {
 	},
 	normalizeVersionName: function(curVersion) {
 		curVersion = curVersion.toUpperCase();
-		if (curVersion === "KJVA") curVersion = "KJV";
+		if (curVersion === "NIVUK")	curVersion = "NIV";
+		else if (curVersion === "KJVA") curVersion = "KJV";
 		else if (curVersion === "ESV_TH") curVersion = "ESV";
 		else if (curVersion === "OHB") curVersion = "OSHB";
 		else if (curVersion === "SBLG") curVersion = "SBLG_TH";
@@ -5656,6 +5696,78 @@ step.util = {
 	},
 	capitalizeFirstLetter: function(val) {
 		return String(val).charAt(0).toUpperCase() + String(val).slice(1);
-	}
+	},
+	checkStrongAltMorph: function(strong, morphCode, greekWord) {
+		var strongNum = strong.substring(1);
+		var fileNum =  Math.trunc(strongNum / 500) * 500;
+		var fileName = "AltMorph" + fileNum + ".json";
+		$.getJSON('/html/json/AltMorph/' + fileName, function(data) {
+			if (typeof data !== "object" || typeof data[strong] !== "object" || typeof data[strong][morphCode] !== "string" || data[strong][morphCode] === "")
+				return;
+			var greek = (typeof greekWord === "string") ? greekWord : data[strong][morphCode].split(";")[0];
+			step.util.addAltMorphLink(strong, morphCode, greek);
+		});
+	},
+	checkGreekAltMorph: function(strong, morphCode, greekWord, versionOfGreek) {
+		greekWord = greekWord.replace(/^[\[(12>]+/g, "").replace(/[´ι,—;;··.\]\s)⸃⸅]+$/g, "").toLowerCase(); // The repeated characters are different characters.
+		var folderName = (versionOfGreek === "LXX") ? "LXX" : "nt";
+		$.getJSON('/html/json/AltMorph/NoAltGreek/' + folderName + '/notunique.json', function(data) {
+			if (typeof data !== "object" || !Array.isArray(data))
+				return;
+			var left = 0;
+			var right = data.length -1;
+			while (left <= right) {
+				var mid = (left + right) >> 1; // Bitwise right shift to find mid.  Same as divide by 2 with no remainder.
+				var currentElement = data[mid];
+				if (currentElement === greekWord)
+					return; // greekWord found, word has no morph
+				else if (currentElement < greekWord)
+					left = mid + 1; // Narrow search to the right half
+				else
+					right = mid - 1; // Narrow search to the left half
+			}
+			var greekNoAccent = greekWord.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+			var firstLetter = step.util.translateGreekChar2Eng(greekNoAccent.substring(0,1));
+			$.getJSON('/html/json/AltMorph/NoAltGreek/' + folderName + '/' + firstLetter + '.json', function(data) {
+				var searchWord = greekNoAccent.substring(1); // All words in json file starts with the same first letter.  Therefore, the first character is not in the file.
+				if (typeof data !== "object" || !Array.isArray(data))
+					return;
+				var left = 0;
+				var right = data.length -1;
+				while (left <= right) { // Bitwise right shift to find mid.  Same as divide by 2 with no remainder.
+					var mid = (left + right) >> 1; 
+					var currentElement = data[mid];
+					if (currentElement === searchWord)
+						return; // greekWord found, word has no morph
+					else if (currentElement < searchWord)
+						left = mid + 1; // Narrow search to the right half
+					else
+						right = mid - 1; // Narrow search to the left half
+				}
+				step.util.addAltMorphLink(strong, morphCode, greekWord);
+			});
+		});
+	},
+    translateGreekChar2Eng: function (firstChar) {
+        greekMap = {'α': 'a', 'β': 'b', 'ξ': 'c', 'δ': 'd', 'ε': 'e', 'φ': 'f',
+                    'γ': 'g', 'η': 'h', 'ι': 'i', 'κ': 'k', 'λ': 'l', 'μ': 'm',
+                    'ν': 'n', 'ο': 'o', 'π': 'p', 'θ': 'q', 'ρ': 'r', 'σ': 's',
+                    'τ': 't', 'υ': 'u', 'ω': 'w', 'Ω': 'w', 'χ': 'x', 'ψ': 'y',
+                    'ζ': 'z', '᾽': '᾽'};
+        if (greekMap[firstChar])
+            return greekMap[firstChar];
+        console.log("unrecognized first char " + firstChar);
+        return firstChar;
+    },
+	addAltMorphLink: function (strong, morphCode, greekWord) {
+        var altMorphSpan = $('#altMorph_' + strong + "_" + morphCode);
+        if (altMorphSpan.text() !== "")
+            return; // Already populated.
+        var altMorphUrl = "https://www.perseus.tufts.edu/hopper/morph?l=" + encodeURIComponent(greekWord) + "&la=greek";
+        altMorphSpan.append("<br>");
+        altMorphSpan.append($("<a target='_blank' rel='noopener noreferrer'>")
+            .attr("href", altMorphUrl)
+            .text("Check Alt. Morphologies"));
+    }
 }
 ;
