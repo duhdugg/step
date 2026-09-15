@@ -136,11 +136,11 @@ public class Bridge {
         }
     }
 
-    public static int getFileMtime(String filePath) throws IOException {
+    public static long getFileMtime(String filePath) throws IOException {
         File file = new File(filePath);
         if (!file.exists()) {
             return 0;
         }
-        return (int) file.lastModified();
+        return (long) file.lastModified();
     }
 }
