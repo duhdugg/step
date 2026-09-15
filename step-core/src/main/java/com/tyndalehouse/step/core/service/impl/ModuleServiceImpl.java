@@ -18,6 +18,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
@@ -133,7 +134,7 @@ public class ModuleServiceImpl implements ModuleService {
                 continue;
             }
 
-            try (Stream<Path> walk = Files.walk(rootPath)) {
+            try (Stream<Path> walk = Files.walk(rootPath, FileVisitOption.FOLLOW_LINKS)) {
                 List<HomeDirectoryInfo> infos = walk
                         .filter(Files::isRegularFile)
                         // TODO FIXME filter to offline-licensed modules only
